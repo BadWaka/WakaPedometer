@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.waka.workspace.wakapedometer">
+
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".MainActivity" />
+
+        <service android:name=".PedometerService" />
+
+        <activity
+            android:name=".LoginActivityDemo"
+            android:label="@string/title_activity_login_activity_demo" />
+        <activity
+            android:name=".Splash.SignInActivity"
+            android:label="@string/title_sign_in_activity"
+            android:theme="@style/Theme.AppCompat.Light.Dialog.MinWidth">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".Splash.SignUpActivity"
+            android:label="@string/title_sign_up_activity"
+            android:theme="@style/Theme.AppCompat.Light.Dialog.MinWidth"></activity>
+        <activity
+            android:name=".Splash.SplashActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+
+        </activity>
+    </application>
+
+</manifest>
