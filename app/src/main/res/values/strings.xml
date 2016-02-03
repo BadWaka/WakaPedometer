@@ -13,8 +13,13 @@
         completions."
     </string>
 
+    <!--SplashActivity-->
+    <string name="title_activity_splash">SplashActivity</string>
+    <string name="btn_sign_up_splash_activity">注册</string>
+    <string name="btn_sign_in_splash_activity">登录</string>
+
     <!--SignInAcitivty-->
-    <string name="title_sign_in_activity">登录</string>
+    <string name="title_sign_in_activity">登录或注册</string>
     <string name="prompt_account_sign_in_activity">请输入账号</string>
     <string name="prompt_password_sign_in_activity">请输入密码</string>
     <string name="btn_sign_up_sign_in_activity">注册</string>
@@ -22,8 +27,14 @@
 
     <!--SignUpAcitivty-->
     <string name="title_sign_up_activity">注册</string>
+    <string name="prompt_account_sign_up_activity">请输入用户名</string>
+    <string name="prompt_password_sign_up_activity">请输入密码</string>
+    <string name="prompt_password_again_sign_up_activity">请再次输入密码</string>
+    <string name="btn_sign_up_sign_up_activity">注册</string>
+    <string name="prompt_account_not_null_sign_up_activity">用户名不能为空</string>
+    <string name="prompt_password_not_null_sign_up_activity">密码不能为空</string>
+    <string name="prompt_passwordagain_not_same_sign_up_activity">两次输入的密码不一致</string>
+    <string name="prompt_account_already_exist_sign_up_activity">用户名已存在</string>
 
-    <string name="title_activity_splash">SplashActivity</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
+
 </resources>

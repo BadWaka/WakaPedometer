@@ -1,11 +1,11 @@
-package com.waka.workspace.wakapedometer.Model;
+package com.waka.workspace.wakapedometer.model;
 
 /**
  * 人员类
  * Created by waka on 2016/2/2.
  */
 public class PersonModel {
-    private String personId;//人员id
+    private String id;//人员id
     private String name;//姓名
     private int sex;//性别
     private int age;//年龄
@@ -18,12 +18,12 @@ public class PersonModel {
     /**
      * get set 方法
      */
-    public String getPersonId() {
-        return personId;
+    public String getId() {
+        return id;
     }
 
-    public void setPersonId(String personId) {
-        this.personId = personId;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {

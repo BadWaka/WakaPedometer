@@ -1,4 +1,4 @@
-package com.waka.workspace.wakapedometer.StepListener;
+package com.waka.workspace.wakapedometer.steplistener;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;

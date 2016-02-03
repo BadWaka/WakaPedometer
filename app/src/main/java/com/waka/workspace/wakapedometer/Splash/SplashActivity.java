@@ -1,25 +1,33 @@
-package com.waka.workspace.wakapedometer.Splash;
+package com.waka.workspace.wakapedometer.splash;
 
-import android.support.v4.app.Fragment;
+import android.content.Intent;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
 
-import com.waka.workspace.wakapedometer.Adapter.MyFragmentPagerAdapter;
+import com.waka.workspace.wakapedometer.Constant;
 import com.waka.workspace.wakapedometer.R;
-
-import java.util.ArrayList;
+import com.waka.workspace.wakapedometer.database.DBHelper;
+import com.waka.workspace.wakapedometer.login.SignInActivity;
+import com.waka.workspace.wakapedometer.login.SignUpActivity;
 
 /**
  * 水花界面！等待预加载Activity
  */
-public class SplashActivity extends AppCompatActivity {
+public class SplashActivity extends AppCompatActivity implements View.OnClickListener {
 
-    //主体Fragment和ViewPager
-    private ViewPager mViewPager;
-    private ArrayList<Fragment> mFragmentList;
-    private SplashFragment mFragment1, mFragment2, mFragment3;
-    private MyFragmentPagerAdapter mAdapter;
+    //数据库
+    private DBHelper mDBHelper;
+
+    //ViewPager
+    private ViewPager viewPager;
+    private SplashImagePagerAdapter adapter;
+    private int[] mImgIds;//图片id数组
+
+    //登录、注册
+    private TextView tvSignIn, tvSignUp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,43 +39,64 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        mViewPager = (ViewPager) findViewById(R.id.viewPager);
+        viewPager = (ViewPager) findViewById(R.id.viewPager);
+        tvSignIn = (TextView) findViewById(R.id.tvSignIn);
+        tvSignUp = (TextView) findViewById(R.id.tvSignUp);
     }
 
     private void initData() {
 
-        //初始化ViewPager和Fragment
-        mFragment1 = SplashFragment.newInstance(initFragmentData(1, ""));
-        mFragment2 = SplashFragment.newInstance(initFragmentData(2, ""));
-        mFragment3 = SplashFragment.newInstance(initFragmentData(3, ""));
+        //初始化数据库
+        mDBHelper = new DBHelper(SplashActivity.this, Constant.DB, null, 1);
+        mDBHelper.getWritableDatabase();
 
-        mFragmentList = new ArrayList<>();
-        mFragmentList.add(mFragment1);
-        mFragmentList.add(mFragment2);
-        mFragmentList.add(mFragment3);
-
-        mAdapter = new MyFragmentPagerAdapter(getSupportFragmentManager(), mFragmentList);
-
-        mViewPager.setAdapter(mAdapter);
-        mViewPager.setCurrentItem(0);
+        //给ViewPager设置Adapter
+        mImgIds = new int[]{R.drawable.splash_img3, R.drawable.splash_img2, R.drawable.splash_img1};
+        adapter = new SplashImagePagerAdapter(SplashActivity.this, mImgIds);
+        viewPager.setAdapter(adapter);
 
     }
 
     private void initEvent() {
-
+        tvSignIn.setOnClickListener(this);
+        tvSignUp.setOnClickListener(this);
     }
 
-    /**
-     * 初始化Fragment数据
-     *
-     * @param imgId 背景图片id
-     * @param text  文本
-     * @return
-     */
-    private Bundle initFragmentData(int imgId, String text) {
-        Bundle bundle = new Bundle();
-        bundle.putInt("imgId", imgId);
-        bundle.putString("text", text);
-        return bundle;
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+
+            //登录
+            case R.id.tvSignIn:
+                Intent intentSignIn = new Intent(SplashActivity.this, SignInActivity.class);
+                startActivityForResult(intentSignIn, Constant.REQUEST_CODE_SIGN_IN_ACTIVITY);
+                break;
+
+            //注册
+            case R.id.tvSignUp:
+                Intent intentSignUp = new Intent(SplashActivity.this, SignUpActivity.class);
+                startActivityForResult(intentSignUp, Constant.REQUEST_CODE_SIGN_UP_ACTIVITY);
+                break;
+
+            default:
+                break;
+
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+
+            //注册Activity回传
+            case Constant.REQUEST_CODE_SIGN_UP_ACTIVITY:
+                if (resultCode == RESULT_OK) {
+                    finish();
+                }
+                break;
+
+            default:
+                break;
+        }
     }
 }

@@ -1,4 +1,4 @@
-package com.waka.workspace.wakapedometer.Adapter;
+package com.waka.workspace.wakapedometer.adapter;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;

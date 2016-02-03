@@ -19,25 +19,27 @@
 
         <activity
             android:name=".LoginActivityDemo"
-            android:label="@string/title_activity_login_activity_demo" />
+            android:label="@string/title_activity_login_activity_demo">
+
+        </activity>
         <activity
-            android:name=".Splash.SignInActivity"
+            android:name=".login.SignInActivity"
             android:label="@string/title_sign_in_activity"
             android:theme="@style/Theme.AppCompat.Light.Dialog.MinWidth">
+
+        </activity>
+        <activity
+            android:name=".login.SignUpActivity"
+            android:label="@string/title_sign_up_activity"
+            android:theme="@style/Theme.AppCompat.Light.Dialog.MinWidth"></activity>
+        <activity
+            android:name=".splash.SplashActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name=".Splash.SignUpActivity"
-            android:label="@string/title_sign_up_activity"
-            android:theme="@style/Theme.AppCompat.Light.Dialog.MinWidth"></activity>
-        <activity
-            android:name=".Splash.SplashActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-
         </activity>
     </application>
 

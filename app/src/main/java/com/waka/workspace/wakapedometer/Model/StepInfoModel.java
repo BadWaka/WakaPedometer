@@ -1,4 +1,4 @@
-package com.waka.workspace.wakapedometer.Model;
+package com.waka.workspace.wakapedometer.model;
 
 import java.sql.Date;
 

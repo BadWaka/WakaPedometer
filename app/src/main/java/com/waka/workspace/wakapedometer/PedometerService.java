@@ -11,9 +11,9 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.waka.workspace.wakapedometer.StepListener.AccelerometerListener;
-import com.waka.workspace.wakapedometer.StepListener.StepCounterListener;
-import com.waka.workspace.wakapedometer.StepListener.StepDetectorListener;
+import com.waka.workspace.wakapedometer.steplistener.AccelerometerListener;
+import com.waka.workspace.wakapedometer.steplistener.StepCounterListener;
+import com.waka.workspace.wakapedometer.steplistener.StepDetectorListener;
 
 /**
  * 计步服务

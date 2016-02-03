@@ -8,11 +8,12 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".Splash.SignInActivity">
+    tools:context=".login.SignInActivity">
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme">
 
         <AutoCompleteTextView
             android:id="@+id/actvAccount"
@@ -24,7 +25,8 @@
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme">
 
         <EditText
             android:id="@+id/etPassword"
@@ -35,25 +37,29 @@
             android:singleLine="true" />
     </android.support.design.widget.TextInputLayout>
 
-    <Button
-        android:id="@+id/btnSignIn"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#FFFFFF"
-        android:text="@string/btn_sign_in_sign_in_activity" />
+        android:gravity="center_horizontal">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:clickable="true"
-        android:gravity="center"
-        android:text="555" />
+        <Button
+            android:id="@+id/btnSignUp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:background="?android:attr/selectableItemBackground"
+            android:gravity="center"
+            android:text="@string/btn_sign_up_sign_in_activity" />
 
-    <Button
-        android:id="@+id/btnSignUp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/btn_sign_up_sign_in_activity" />
+        <Button
+            android:id="@+id/btnSignIn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:background="?android:attr/selectableItemBackground"
+            android:gravity="center"
+            android:text="@string/btn_sign_in_sign_in_activity" />
+
+    </RelativeLayout>
 
 </LinearLayout>
