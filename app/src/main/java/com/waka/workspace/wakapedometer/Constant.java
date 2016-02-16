@@ -6,6 +6,8 @@ package com.waka.workspace.wakapedometer;
  */
 public class Constant {
 
+    public static final String COOKIE_LOGIN = "loginCookie";//登录Cookie在SharedPreference中的关键字
+
     /**
      * RequestCode
      */

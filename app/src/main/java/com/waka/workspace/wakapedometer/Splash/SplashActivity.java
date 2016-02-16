@@ -9,9 +9,11 @@ import android.widget.TextView;
 
 import com.waka.workspace.wakapedometer.Constant;
 import com.waka.workspace.wakapedometer.R;
+import com.waka.workspace.wakapedometer.Utils;
 import com.waka.workspace.wakapedometer.database.DBHelper;
 import com.waka.workspace.wakapedometer.login.SignInActivity;
 import com.waka.workspace.wakapedometer.login.SignUpActivity;
+import com.waka.workspace.wakapedometer.main.MainActivity;
 
 /**
  * 水花界面！等待预加载Activity
@@ -29,21 +31,49 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     //登录、注册
     private TextView tvSignIn, tvSignUp;
 
+    /**
+     * onCreate
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+
+        checkOutLoginCookie();
+
         initView();
         initData();
         initEvent();
     }
 
+    /**
+     * 检查LoginCookie
+     */
+    private void checkOutLoginCookie() {
+
+        //得到loginCookie
+        String loginCookie = Utils.getLoginCookie(getApplicationContext());
+
+        //如果loginCookie不为空
+        if (!loginCookie.isEmpty()) {
+            //直接跳转到MainActivity
+            Intent intentMain = new Intent(SplashActivity.this, MainActivity.class);
+            startActivityForResult(intentMain, Constant.REQUEST_CODE_MAIN_ACTIVITY);
+            setResult(RESULT_OK);
+            finish();
+        }
+    }
+
+    /*initView*/
     private void initView() {
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         tvSignIn = (TextView) findViewById(R.id.tvSignIn);
         tvSignUp = (TextView) findViewById(R.id.tvSignUp);
     }
 
+    /*initData*/
     private void initData() {
 
         //初始化数据库
@@ -57,11 +87,17 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
 
     }
 
+    /*initEvent*/
     private void initEvent() {
         tvSignIn.setOnClickListener(this);
         tvSignUp.setOnClickListener(this);
     }
 
+    /**
+     * onClick
+     *
+     * @param v
+     */
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -84,9 +120,23 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
+    /**
+     * onActivityResult
+     *
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
+
+            //登录Activity回传
+            case Constant.REQUEST_CODE_SIGN_IN_ACTIVITY:
+                if (resultCode == RESULT_OK) {
+                    finish();
+                }
+                break;
 
             //注册Activity回传
             case Constant.REQUEST_CODE_SIGN_UP_ACTIVITY:

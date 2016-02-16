@@ -1,8 +1,9 @@
 package com.waka.workspace.wakapedometer.login;
 
 import android.content.Intent;
-import android.database.Cursor;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -11,9 +12,11 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.waka.workspace.wakapedometer.Constant;
+import com.waka.workspace.wakapedometer.Utils;
+import com.waka.workspace.wakapedometer.main.MainActivity;
 import com.waka.workspace.wakapedometer.R;
 import com.waka.workspace.wakapedometer.database.DBHelper;
-import com.waka.workspace.wakapedometer.database.PersonDBHelper;
+import com.waka.workspace.wakapedometer.database.PersonDB;
 
 /**
  * 登录Activity
@@ -23,7 +26,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
     //数据库
     private DBHelper mDBHelper;
     private SQLiteDatabase mDB;
-    private PersonDBHelper mPersonDBHelper;
+    private PersonDB mPersonDB;
 
     //控件
     private AutoCompleteTextView actvAccount;
@@ -53,7 +56,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         //初始化数据库
         mDBHelper = new DBHelper(SignInActivity.this, Constant.DB, null, 1);
         mDB = mDBHelper.getWritableDatabase();
-        mPersonDBHelper = new PersonDBHelper(mDB);
+        mPersonDB = new PersonDB(mDB);
 
     }
 
@@ -85,6 +88,28 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                     return;
                 }
 
+                //判断账户是否存在
+                boolean existFlag = mPersonDB.isExistAccount(account);
+                if (!existFlag) {
+                    actvAccount.setError(getString(R.string.prompt_account_not_exist_sign_in_activity));
+                    actvAccount.requestFocus();
+                    return;
+                }
+
+                //判断用户名密码是否匹配
+                boolean matchFlag = mPersonDB.isMatching(account, password);
+                if (!matchFlag) {
+                    etPassword.setError(getString(R.string.prompt_password_error_sign_in_activity));
+                    etPassword.requestFocus();
+                    return;
+                }
+
+                Utils.setLoginCookie(getApplicationContext(), "我是loginCookie");
+
+                Intent intentMain = new Intent(SignInActivity.this, MainActivity.class);
+                startActivityForResult(intentMain, Constant.REQUEST_CODE_MAIN_ACTIVITY);
+                setResult(RESULT_OK);
+                finish();
 
                 break;
 
@@ -103,33 +128,4 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-    /**
-     * 检测用户名与密码是否匹配
-     *
-     * @param account
-     * @param password
-     * @return 匹配, return 1;
-     * --------不匹配,return 0;
-     * --------用户名不存在,return -1;
-     */
-    private int isAccountMatchingPassword(String account, String password) {
-
-        // SQL语句： select _account,_password from _person where _account = '1456683844@qq.com'
-        Cursor cursor = mDB.rawQuery("select " + Constant.COLUMN_ACCOUNT + "," + Constant.COLUMN_PASSWORD + " from " + Constant.TABLE_PERSON
-                + " where " + Constant.COLUMN_ACCOUNT + " = ?", new String[]{account});
-
-        //用户名不存在
-        if (!cursor.moveToFirst()) {
-            cursor.close();
-            return -1;
-        }
-        String passwordDB = cursor.getString(cursor.getColumnIndex(Constant.COLUMN_PASSWORD));
-        cursor.close();
-
-        //如果不匹配
-        if (!password.equals(passwordDB)) {
-            return 0;
-        }
-        return 1;
-    }
 }

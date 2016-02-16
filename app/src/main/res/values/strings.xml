@@ -1,17 +1,5 @@
 <resources>
     <string name="app_name">WakaPedometer</string>
-    <string name="title_activity_login_activity_demo">Sign in</string>
-
-    <!-- Strings related to login -->
-    <string name="action_sign_in">Sign in or register</string>
-    <string name="action_sign_in_short">Sign in</string>
-    <string name="error_invalid_email">This email address is invalid</string>
-    <string name="error_invalid_password">This password is too short</string>
-    <string name="error_incorrect_password">This password is incorrect</string>
-    <string name="error_field_required">This field is required</string>
-    <string name="permission_rationale">"Contacts permissions are needed for providing email
-        completions."
-    </string>
 
     <!--SplashActivity-->
     <string name="title_activity_splash">SplashActivity</string>
@@ -24,6 +12,8 @@
     <string name="prompt_password_sign_in_activity">请输入密码</string>
     <string name="btn_sign_up_sign_in_activity">注册</string>
     <string name="btn_sign_in_sign_in_activity">登录</string>
+    <string name="prompt_account_not_exist_sign_in_activity">用户名不存在</string>
+    <string name="prompt_password_error_sign_in_activity">密码不正确，请重新输入</string>
 
     <!--SignUpAcitivty-->
     <string name="title_sign_up_activity">注册</string>

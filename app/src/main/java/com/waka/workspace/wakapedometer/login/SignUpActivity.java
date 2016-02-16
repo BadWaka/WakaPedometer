@@ -2,7 +2,6 @@ package com.waka.workspace.wakapedometer.login;
 
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -10,10 +9,10 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.waka.workspace.wakapedometer.Constant;
-import com.waka.workspace.wakapedometer.MainActivity;
+import com.waka.workspace.wakapedometer.main.MainActivity;
 import com.waka.workspace.wakapedometer.R;
 import com.waka.workspace.wakapedometer.database.DBHelper;
-import com.waka.workspace.wakapedometer.database.PersonDBHelper;
+import com.waka.workspace.wakapedometer.database.PersonDB;
 
 /**
  * 注册Activity
@@ -23,7 +22,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     //数据库
     private DBHelper mDBHelper;
     private SQLiteDatabase mDB;
-    private PersonDBHelper mPersonDBHelper;
+    private PersonDB mPersonDB;
 
     private EditText etAccount, etPassword, etPasswordAgain;
     private Button btnSignUp;
@@ -49,12 +48,25 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         //初始化数据库
         mDBHelper = new DBHelper(SignUpActivity.this, Constant.DB, null, 1);
         mDB = mDBHelper.getWritableDatabase();
-        mPersonDBHelper = new PersonDBHelper(mDB);
+        mPersonDB = new PersonDB(mDB);
 
     }
 
     private void initEvent() {
+
         btnSignUp.setOnClickListener(this);
+
+        //为用户名editText注册焦点改变监听
+        etAccount.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                String account = etAccount.getText().toString();
+                boolean existFlag = mPersonDB.isExistAccount(account);//判断数据库中是否已存在该用户名
+                if (existFlag) {//如果存在，则提示该用户名已存在
+                    etAccount.setError(getString(R.string.prompt_account_already_exist_sign_up_activity));
+                }
+            }
+        });
     }
 
     @Override
@@ -90,7 +102,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                 }
 
                 //添加进数据库中
-                boolean addFlag = mPersonDBHelper.add(account, password);
+                boolean addFlag = mPersonDB.add(account, password);
                 if (!addFlag) {//用户名已存在，添加失败
                     etAccount.setError(getString(R.string.prompt_account_already_exist_sign_up_activity));
                     etAccount.requestFocus();
