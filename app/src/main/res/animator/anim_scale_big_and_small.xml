@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--先放大再缩小动画-->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:ordering="sequentially">
+
+    <!--先放大1.5倍-->
+    <set android:ordering="together">
+        <objectAnimator
+            android:duration="250"
+            android:propertyName="scaleX"
+            android:valueFrom="1"
+            android:valueTo="1.5"
+            android:valueType="floatType">
+
+        </objectAnimator>
+        <objectAnimator
+            android:duration="250"
+            android:propertyName="scaleY"
+            android:valueFrom="1"
+            android:valueTo="1.5"
+            android:valueType="floatType">
+
+        </objectAnimator>
+    </set>
+
+    <!--再缩小至原来大小-->
+    <set android:ordering="together">
+        <objectAnimator
+            android:duration="250"
+            android:propertyName="scaleX"
+            android:valueFrom="1.5"
+            android:valueTo="1"
+            android:valueType="floatType">
+
+        </objectAnimator>
+        <objectAnimator
+            android:duration="250"
+            android:propertyName="scaleY"
+            android:valueFrom="1.5"
+            android:valueTo="1"
+            android:valueType="floatType">
+
+        </objectAnimator>
+    </set>
+
+</set>

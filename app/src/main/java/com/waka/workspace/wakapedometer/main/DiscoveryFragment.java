@@ -12,12 +12,12 @@ import com.waka.workspace.wakapedometer.R;
 /**
  * Created by waka on 2016/2/16.
  */
-public class MineFragment extends Fragment {
+public class DiscoveryFragment extends Fragment {
 
     /**
      * 构造方法
      */
-    public MineFragment() {
+    public DiscoveryFragment() {
 
     }
 
@@ -27,8 +27,8 @@ public class MineFragment extends Fragment {
      * @param bundle
      * @return
      */
-    public static MineFragment newInstance(Bundle bundle) {
-        MineFragment fragment = new MineFragment();
+    public static DiscoveryFragment newInstance(Bundle bundle) {
+        DiscoveryFragment fragment = new DiscoveryFragment();
         fragment.setArguments(bundle);
         return fragment;
     }

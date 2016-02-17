@@ -26,5 +26,10 @@
     <string name="prompt_passwordagain_not_same_sign_up_activity">两次输入的密码不一致</string>
     <string name="prompt_account_already_exist_sign_up_activity">用户名已存在</string>
 
+    <!--MainActivity-->
+    <string name="tab_text_pedometer_main_activity">计步</string>
+    <string name="tab_text_history_main_activity">历史</string>
+    <string name="tab_text_discovery_main_activity">发现</string>
+
 
 </resources>
