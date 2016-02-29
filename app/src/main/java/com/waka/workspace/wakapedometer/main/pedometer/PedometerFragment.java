@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.waka.workspace.wakapedometer.R;
+import com.waka.workspace.wakapedometer.customview.RoundProgressBar;
 
 /**
  * Created by waka on 2016/2/16.
@@ -19,7 +20,8 @@ public class PedometerFragment extends Fragment implements View.OnClickListener 
 
     private static final String TAG = "PedometerFragment";
 
-    private Button btnStart, btnStop;
+    private RoundProgressBar roundProgressBar;
+    private Button btnAdd;
 
     /**
      * 构造方法
@@ -73,8 +75,8 @@ public class PedometerFragment extends Fragment implements View.OnClickListener 
     }
 
     private void initView(View view) {
-        btnStart = (Button) view.findViewById(R.id.btnStart);
-        btnStop = (Button) view.findViewById(R.id.btnStop);
+        roundProgressBar = (RoundProgressBar) view.findViewById(R.id.roundProgressBar);
+        btnAdd = (Button) view.findViewById(R.id.btnAdd);
     }
 
     private void initData() {
@@ -82,25 +84,17 @@ public class PedometerFragment extends Fragment implements View.OnClickListener 
     }
 
     private void initEvent() {
-        btnStart.setOnClickListener(this);
-        btnStop.setOnClickListener(this);
+        btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                roundProgressBar.setProgress(roundProgressBar.getProgress() + 100);
+            }
+        });
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-
-            //开始服务
-            case R.id.btnStart:
-                Intent startIntent = new Intent(getActivity(), PedometerService.class);
-                getActivity().startService(startIntent);
-                break;
-
-            //停止服务
-            case R.id.btnStop:
-                Intent stopIntent = new Intent(getActivity(), PedometerService.class);
-                getActivity().stopService(stopIntent);
-                break;
 
             default:
                 break;

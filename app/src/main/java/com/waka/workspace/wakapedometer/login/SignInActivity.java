@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -13,6 +14,7 @@ import android.widget.EditText;
 
 import com.waka.workspace.wakapedometer.Constant;
 import com.waka.workspace.wakapedometer.Utils;
+import com.waka.workspace.wakapedometer.database.model.PersonModel;
 import com.waka.workspace.wakapedometer.main.MainActivity;
 import com.waka.workspace.wakapedometer.R;
 import com.waka.workspace.wakapedometer.database.DBHelper;
@@ -22,6 +24,8 @@ import com.waka.workspace.wakapedometer.database.PersonDB;
  * 登录Activity
  */
 public class SignInActivity extends AppCompatActivity implements View.OnClickListener {
+
+    private static final String TAG = "SignInActivity";
 
     //数据库
     private DBHelper mDBHelper;
@@ -104,7 +108,14 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                     return;
                 }
 
-                Utils.setLoginCookie(getApplicationContext(), "我是loginCookie");
+                PersonModel personModel = mPersonDB.queryByAccount(account);
+                int id = personModel.getId();
+
+                //在SharedPreferences中设置登录Cookie和当前登录人员id
+                if (!Utils.setLoginCookieAndId(getApplicationContext(), "我是loginCookie", id)) {
+                    Log.e(TAG, "写入SharedPreferences失败");
+                    return;
+                }
 
                 Intent intentMain = new Intent(SignInActivity.this, MainActivity.class);
                 startActivityForResult(intentMain, Constant.REQUEST_CODE_MAIN_ACTIVITY);

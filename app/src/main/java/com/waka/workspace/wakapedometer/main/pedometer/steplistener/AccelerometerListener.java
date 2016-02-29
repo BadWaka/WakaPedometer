@@ -6,6 +6,8 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.Log;
 
+import com.waka.workspace.wakapedometer.main.pedometer.PedometerService;
+
 /**
  * AccelerometerListener
  * 加速度传感器，最差选择，软件层算法模拟，精度最低，但普及率最高
@@ -16,7 +18,8 @@ public class AccelerometerListener implements SensorEventListener {
 
     private static final String TAG = "Pedometer Accelerometer";
 
-    private int steps = 0;//步数
+    private PedometerService mPedometerService;
+
     private float sensitivity = 2; //灵敏度     灵敏度为1的时候轻轻晃一下就计步了，灵敏度为10时得狠狠地晃才行
 
     private float mLastValues[] = new float[3 * 2];
@@ -32,9 +35,14 @@ public class AccelerometerListener implements SensorEventListener {
 
     /**
      * 构造方法
+     *
+     * @param pedometerService
      */
-    public AccelerometerListener() {
+    public AccelerometerListener(PedometerService pedometerService) {
         super();
+
+        mPedometerService = pedometerService;
+
         int h = 480;
         mYOffset = h * 0.5f;
         mScale[0] = -(h * 0.5f * (1.0f / (SensorManager.STANDARD_GRAVITY * 2)));
@@ -68,7 +76,7 @@ public class AccelerometerListener implements SensorEventListener {
                     end = System.currentTimeMillis();
 
                     if (end - start > 500) {// 此时判断为走了一步
-                        steps++;
+                        mPedometerService.steps++;
                         mLastMatch = extType;
                         start = end;
                     }
@@ -81,7 +89,7 @@ public class AccelerometerListener implements SensorEventListener {
         mLastDirections[k] = direction;
         mLastValues[k] = v;
 
-        Log.i(TAG, "steps:" + steps);
+        Log.i(TAG, "steps:" + mPedometerService.steps);
     }
 
     @Override
@@ -89,19 +97,4 @@ public class AccelerometerListener implements SensorEventListener {
 
     }
 
-    public int getSteps() {
-        return steps;
-    }
-
-    public void setSteps(int steps) {
-        this.steps = steps;
-    }
-
-    public float getSensitivity() {
-        return sensitivity;
-    }
-
-    public void setSensitivity(float sensitivity) {
-        this.sensitivity = sensitivity;
-    }
 }

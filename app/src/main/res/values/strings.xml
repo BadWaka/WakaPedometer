@@ -20,16 +20,32 @@
     <string name="prompt_account_sign_up_activity">请输入用户名</string>
     <string name="prompt_password_sign_up_activity">请输入密码</string>
     <string name="prompt_password_again_sign_up_activity">请再次输入密码</string>
+    <string name="prompt_nickname_sign_up_activity">起个好听的昵称吧</string>
     <string name="btn_sign_up_sign_up_activity">注册</string>
     <string name="prompt_account_not_null_sign_up_activity">用户名不能为空</string>
     <string name="prompt_password_not_null_sign_up_activity">密码不能为空</string>
     <string name="prompt_passwordagain_not_same_sign_up_activity">两次输入的密码不一致</string>
+    <string name="prompt_nickname_not_null_sign_up_activity">昵称不能为空</string>
     <string name="prompt_account_already_exist_sign_up_activity">用户名已存在</string>
 
     <!--MainActivity-->
     <string name="tab_text_pedometer_main_activity">计步</string>
     <string name="tab_text_history_main_activity">历史</string>
     <string name="tab_text_discovery_main_activity">发现</string>
+    <string name="prompt_double_exit_tips_main_activity">再按一次退出程序</string>
+    <!--DrawerMenu-->
+    <string name="nav_title_service_switch_main_activity">后台开关</string>
+    <string name="nav_start_service_main_activity">开始计步服务</string>
+    <string name="nav_stop_service_main_activity">停止计步服务</string>
+    <string name="nav_logout_main_activity">退出登录</string>
+    <string name="prompt_confirm_logout_main_activity">确定要退出登录吗？</string>
+    <string name="btn_confirm_main_activity">确定</string>
+    <string name="btn_cancel_main_activity">取消</string>
+    <!--PedometerService-->
+    <string name="prompt_no_use_sensor_pedometer_service">没有可用的传感器</string>
+    <string name="prompt_notification_ticker_pedometer_service">开始计步</string>
+    <string name="prompt_notification_title_step_pedometer_service">步</string>
+    <string name="prompt_notification_text_calories_pedometer_service">千卡</string>
 
 
 </resources>

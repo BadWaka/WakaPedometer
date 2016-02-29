@@ -4,6 +4,10 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="activity_half_margin">8dp</dimen>
 
+    <!--侧边栏-->
+    <dimen name="nav_header_vertical_spacing">16dp</dimen>
+    <dimen name="nav_header_height">160dp</dimen>
+
     <!--图标大小-->
     <dimen name="icon_small">24dp</dimen>
     <dimen name="icon_middle">36dp</dimen>

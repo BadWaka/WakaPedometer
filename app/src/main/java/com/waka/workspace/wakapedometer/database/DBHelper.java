@@ -20,15 +20,30 @@ public class DBHelper extends SQLiteOpenHelper {
 
     //创建人员表
     private static final String CREATE_TABLE_PERSON = "create table " + Constant.TABLE_PERSON + " ("
-            + Constant.COLUMN_ID + " integer primary key autoincrement, "
-            + Constant.COLUMN_NAME + " text, "
-            + Constant.COLUMN_SEX + " integer, "
-            + Constant.COLUMN_AGE + " integer, "
-            + Constant.COLUMN_HEIGHT + " real, "
-            + Constant.COLUMN_WEIGHT + " real, "
-            + Constant.COLUMN_ACCOUNT + " text unique, "       //account账户不可重复
-            + Constant.COLUMN_PASSWORD + " text)";
+            + Constant.PERSON_COLUMN_ID + " integer primary key autoincrement, "
+            + Constant.PERSON_COLUMN_NICK_NAME + " text, "
+            + Constant.PERSON_COLUMN_NAME + " text, "
+            + Constant.PERSON_COLUMN_SEX + " integer, "
+            + Constant.PERSON_COLUMN_AGE + " integer, "
+            + Constant.PERSON_COLUMN_HEIGHT + " real, "
+            + Constant.PERSON_COLUMN_WEIGHT + " real, "
+            + Constant.PERSON_COLUMN_ACCOUNT + " text unique, "       //account账户不可重复
+            + Constant.PERSON_COLUMN_PASSWORD + " text)";
 
+    //创建步数信息表
+    private static final String CREATE_TABLE_STEP_INFO = "create table " + Constant.TABLE_STEP_INFO + " ("
+            + Constant.STEP_INFO_COLUMN_PERSON_ID + " integer, "
+            + Constant.STEP_INFO_COLUMN_STEP + " integer, "
+            + Constant.STEP_INFO_COLUMN_DATE + " text)";
+
+    /**
+     * 构造方法
+     *
+     * @param context
+     * @param name
+     * @param factory
+     * @param version
+     */
     public DBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
         mContext = context;
@@ -39,7 +54,11 @@ public class DBHelper extends SQLiteOpenHelper {
 
         Log.i(TAG, "CREATE_TABLE_PERSON---->" + CREATE_TABLE_PERSON);
         db.execSQL(CREATE_TABLE_PERSON);//创建人员表
-        Toast.makeText(mContext, "数据库创建成功", Toast.LENGTH_SHORT).show();
+        Toast.makeText(mContext, "人员表创建成功", Toast.LENGTH_SHORT).show();
+
+        Log.i(TAG, "CREATE_TABLE_STEP_INFO---->" + CREATE_TABLE_STEP_INFO);
+        db.execSQL(CREATE_TABLE_STEP_INFO);//创建步数信息表
+        Toast.makeText(mContext, "步数信息表创建成功", Toast.LENGTH_SHORT).show();
 
     }
 

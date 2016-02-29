@@ -4,11 +4,14 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
 import com.waka.workspace.wakapedometer.Constant;
+import com.waka.workspace.wakapedometer.Utils;
+import com.waka.workspace.wakapedometer.database.model.PersonModel;
 import com.waka.workspace.wakapedometer.main.MainActivity;
 import com.waka.workspace.wakapedometer.R;
 import com.waka.workspace.wakapedometer.database.DBHelper;
@@ -19,12 +22,14 @@ import com.waka.workspace.wakapedometer.database.PersonDB;
  */
 public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
 
+    private static final String TAG = "SignUpActivity";
+
     //数据库
     private DBHelper mDBHelper;
     private SQLiteDatabase mDB;
     private PersonDB mPersonDB;
 
-    private EditText etAccount, etPassword, etPasswordAgain;
+    private EditText etAccount, etPassword, etPasswordAgain, etNickName;
     private Button btnSignUp;
 
     @Override
@@ -40,6 +45,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         etAccount = (EditText) findViewById(R.id.etAccount);
         etPassword = (EditText) findViewById(R.id.etPassword);
         etPasswordAgain = (EditText) findViewById(R.id.etPasswordAgain);
+        etNickName = (EditText) findViewById(R.id.etNickName);
         btnSignUp = (Button) findViewById(R.id.btnSignUp);
     }
 
@@ -60,6 +66,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         etAccount.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
+
                 String account = etAccount.getText().toString();
                 boolean existFlag = mPersonDB.isExistAccount(account);//判断数据库中是否已存在该用户名
                 if (existFlag) {//如果存在，则提示该用户名已存在
@@ -67,6 +74,27 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                 }
             }
         });
+
+        etPassword.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+
+                if (hasFocus) {
+                    etPasswordAgain.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+        etPasswordAgain.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+
+                if (hasFocus) {
+                    etNickName.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
     }
 
     @Override
@@ -79,6 +107,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                 String account = etAccount.getText().toString();
                 String password = etPassword.getText().toString();
                 String passwordAgain = etPasswordAgain.getText().toString();
+                String nickname = etNickName.getText().toString();
 
                 if (account.isEmpty()) {//用户名为空
                     etAccount.setError(getString(R.string.prompt_account_not_null_sign_up_activity));
@@ -100,12 +129,26 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                     etPasswordAgain.requestFocus();
                     return;
                 }
+                if (nickname.isEmpty()) {//昵称为空
+                    etNickName.setError(getString(R.string.prompt_nickname_not_null_sign_up_activity));
+                    etNickName.requestFocus();
+                    return;
+                }
 
                 //添加进数据库中
-                boolean addFlag = mPersonDB.add(account, password);
+                boolean addFlag = mPersonDB.add(account, password, nickname);
                 if (!addFlag) {//用户名已存在，添加失败
                     etAccount.setError(getString(R.string.prompt_account_already_exist_sign_up_activity));
                     etAccount.requestFocus();
+                    return;
+                }
+
+                PersonModel personModel = mPersonDB.queryByAccount(account);
+                int id = personModel.getId();
+
+                //在SharedPreferences中设置登录Cookie和当前登录人员id
+                if (!Utils.setLoginCookieAndId(getApplicationContext(), "我是loginCookie", id)) {
+                    Log.e(TAG, "写入SharedPreferences失败");
                     return;
                 }
 

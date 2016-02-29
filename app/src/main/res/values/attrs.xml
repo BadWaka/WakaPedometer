@@ -9,4 +9,22 @@
         <attr name="metaButtonBarButtonStyle" format="reference" />
     </declare-styleable>
 
+    <!--自定义圆形进度条-->
+    <declare-styleable name="RoundProgressBar">
+
+        <!--圆环颜色-->
+        <attr name="roundColor" format="color" />
+        <!--圆环进度颜色-->
+        <attr name="roundProgressColor" format="color" />
+        <!--圆环宽度-->
+        <attr name="roundWidth" format="dimension" />
+        <!--字体颜色-->
+        <attr name="textColor" format="color" />
+        <!--字体大小-->
+        <attr name="textSize" format="dimension" />
+        <!--最大值-->
+        <attr name="max" format="integer" />
+
+    </declare-styleable>
+
 </resources>

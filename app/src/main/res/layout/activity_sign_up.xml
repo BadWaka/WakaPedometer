@@ -11,6 +11,7 @@
     tools:context=".login.SignUpActivity">
 
 
+    <!--输入账号-->
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -25,6 +26,7 @@
             android:singleLine="true" />
     </android.support.design.widget.TextInputLayout>
 
+    <!--输入密码-->
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -39,6 +41,7 @@
             android:singleLine="true" />
     </android.support.design.widget.TextInputLayout>
 
+    <!--再次输入密码-->
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -50,7 +53,24 @@
             android:layout_height="wrap_content"
             android:hint="@string/prompt_password_again_sign_up_activity"
             android:inputType="textPassword"
-            android:singleLine="true" />
+            android:singleLine="true"
+            android:visibility="gone" />
+    </android.support.design.widget.TextInputLayout>
+
+    <!--输入昵称-->
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme">
+
+        <EditText
+            android:id="@+id/etNickName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/prompt_nickname_sign_up_activity"
+            android:inputType="textPassword"
+            android:singleLine="true"
+            android:visibility="gone" />
     </android.support.design.widget.TextInputLayout>
 
     <RelativeLayout
