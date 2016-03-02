@@ -6,8 +6,16 @@ package com.waka.workspace.wakapedometer;
  */
 public class Constant {
 
+    /**
+     * 登录信息
+     */
     public static final String COOKIE_LOGIN = "loginCookie";//登录Cookie在SharedPreference中的关键字
     public static final String CURRENT_LOGIN_ID = "currentLoginId";//当前登录人员的id
+
+    /**
+     * 步数改变广播
+     */
+    public static final String STEP_CHANGE_BROADCAST = "com.waka.workspace.wakapedometer.STEP_CHANGE_BROADCAST";
 
     /**
      * RequestCode

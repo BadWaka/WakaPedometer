@@ -307,6 +307,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         //跳转到SplashActivity
                         Intent intent = new Intent(MainActivity.this, SplashActivity.class);
                         startActivity(intent);
+
+                        //关闭计步服务
+                        Intent intentStop = new Intent(MainActivity.this, PedometerService.class);
+                        stopService(intentStop);
+
                         finish();
 
                     }

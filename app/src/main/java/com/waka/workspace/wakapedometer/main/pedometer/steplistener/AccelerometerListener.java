@@ -76,7 +76,7 @@ public class AccelerometerListener implements SensorEventListener {
                     end = System.currentTimeMillis();
 
                     if (end - start > 500) {// 此时判断为走了一步
-                        mPedometerService.steps++;
+                        mPedometerService.stepAccelerometer++;
                         mLastMatch = extType;
                         start = end;
                     }
@@ -89,7 +89,7 @@ public class AccelerometerListener implements SensorEventListener {
         mLastDirections[k] = direction;
         mLastValues[k] = v;
 
-        Log.i(TAG, "steps:" + mPedometerService.steps);
+        Log.i(TAG, "stepAccelerometer:" + mPedometerService.stepAccelerometer);
     }
 
     @Override

@@ -8,7 +8,7 @@ import java.sql.Date;
  */
 public class StepInfoModel {
     private int step;//步数
-    private String personId;//人员id
+    private int personId;//人员id
     private Date date;//日期
 
     /**
@@ -22,11 +22,11 @@ public class StepInfoModel {
         this.step = step;
     }
 
-    public String getPersonId() {
+    public int getPersonId() {
         return personId;
     }
 
-    public void setPersonId(String personId) {
+    public void setPersonId(int personId) {
         this.personId = personId;
     }
 

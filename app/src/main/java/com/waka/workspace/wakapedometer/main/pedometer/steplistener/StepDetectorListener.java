@@ -32,9 +32,9 @@ public class StepDetectorListener implements SensorEventListener {
     public void onSensorChanged(SensorEvent event) {//当传感器监测到的数值发生变化时就会调用
 
         if (event.values[0] == 1) {
-            mPedometerService.steps++;//每走一步+1
+            mPedometerService.stepDetector++;//每走一步+1
         }
-        Log.i(TAG, "steps:" + mPedometerService.steps);
+        Log.i(TAG, "stepAccelerometer:" + mPedometerService.stepDetector);
 
     }
 

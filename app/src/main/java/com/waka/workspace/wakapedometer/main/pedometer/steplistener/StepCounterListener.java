@@ -31,8 +31,8 @@ public class StepCounterListener implements SensorEventListener {
     @Override
     public void onSensorChanged(SensorEvent event) {//当传感器监测到的数值发生变化时就会调用
 
-        mPedometerService.steps = (int) event.values[0];//直接得到步行总数
-        Log.i(TAG, "steps:" + mPedometerService.steps);
+        mPedometerService.stepCounterRaw = (int) event.values[0];//直接得到步行总数
+        Log.i(TAG, "stepAccelerometer:" + mPedometerService.stepCounterRaw);
 
     }
 

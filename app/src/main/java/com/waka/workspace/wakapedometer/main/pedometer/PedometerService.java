@@ -16,8 +16,13 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.sql.Date;
+
+import com.waka.workspace.wakapedometer.Constant;
 import com.waka.workspace.wakapedometer.R;
+import com.waka.workspace.wakapedometer.Utils;
 import com.waka.workspace.wakapedometer.database.DBHelper;
+import com.waka.workspace.wakapedometer.database.StepInfoDB;
 import com.waka.workspace.wakapedometer.main.pedometer.steplistener.AccelerometerListener;
 import com.waka.workspace.wakapedometer.main.pedometer.steplistener.StepCounterListener;
 import com.waka.workspace.wakapedometer.main.pedometer.steplistener.StepDetectorListener;
@@ -30,50 +35,83 @@ public class PedometerService extends Service {
 
     private static final String TAG = "Pedometer Service";
 
-    //传感器
-    private SensorManager mSensorManager;//传感器管理器
-    private Sensor mSensor;//最终使用的传感器
-    private int mSensorType;//最终使用的传感器类型，作为一个判断标识
-    private SensorEventListener mSensorEventListener;//监听器
+    //服务运行标志
+    private boolean serviceFlag = false;
 
-    //步数
-    public int steps = 0;
-    private static final float SCALE_STEP_CALORIES = 43.22f;//卡路里步数换算比例
+    //当前步数
+    private int currentStep;//通知栏显示的统一步数，方便其他类调用
+
+    //卡路里步数换算比例
+    private static final float SCALE_STEP_CALORIES = 43.22f;
+
+    //数据库操作类
+    private int mId;//当前用户id
+    private int timeCounter = 0;//用来计时间，过1s加1，到5s变为0,5s一循环，5s更新一次数据库
+    private DBHelper mDBHelper;
+    private SQLiteDatabase mDB;
+    private StepInfoDB mStepInfoDB;
 
     //通知\前台服务
     private Notification.Builder mNotificationBuilder;
     private Notification mNotification;
     private static final int NOTIFICATION_STEP_SERVICE = 1;//前台服务标记
 
-    //步数更新线程
-    private UpdateStepThread mUpdateStepThread;
-    private boolean mUpdateStepThreadSwitch = true;//线程开关
-    private static final long TIME_INTERVAL_UPDATE_STEP_THREAD = 1000;//1s更新一次步数
-    private static final int MSG_WHAT_UPDATE_STEP = 1;//更新步数通知  message.what
+    //传感器
+    private SensorManager mSensorManager;//传感器管理器
+    private Sensor mSensor;//最终使用的传感器
+    private int mSensorType;//最终使用的传感器类型，作为一个判断标识
+    private SensorEventListener mSensorEventListener;//监听器
 
-    //数据库操作类
-    private int mId;//当前用户id
-    private DBHelper mDBHelper;
-    private SQLiteDatabase mDB;
+    //StepCounter传感器步数更新线程
+    private int stepCounter = 0;//处理好的步数数据
+    private int stepCounterHistory = -1;//数据库中的历史步数
+    public int stepCounterRaw = 0;//原始步数数据
+    private StepCounterThread mStepCounterThread;
+    private static final int MSG_WHAT_STEP_COUNTER_THREAD = 1;//StepCounter传感器步数更新步数通知  message.what
 
-    //写入数据库线程
-    private WriteStepToDBThread mWriteStepToDBThread;
-    private boolean mWriteStepToDBThreadSwitch = true;//线程开关
-    private static final long TIME_INTERVAL_WRITE_STEP_TO_DBTHREAD = 5000;//5s写入一次数据库
-    private static final int MSG_WHAT_WRITE_STEP_TO_DB = 2;//将步数写入DB    message.what
+    //StepDetector传感器步数更新线程
+    public int stepDetector = 0;//StepDetector传感器计步
+    private StepDetectorThread mStepDetectorThread;
+    private static final int MSG_WHAT_STEP_DETECTOR_THREAD = 2;//StepDetector传感器步数更新步数通知  message.what
 
-    //Handler
+    //加速度传感器步数更新线程
+    public int stepAccelerometer = 0;//加速度传感器计步
+    private StepAccelerometerThread mStepAccelerometerThread;
+    private static final int MSG_WHAT_STEP_ACCELEROMETER_THREAD = 3;//加速度传感器步数更新步数通知  message.what
+
+    //Handler，在主线程更新通知
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
 
-            //更新步数通知
-            if (msg.what == MSG_WHAT_UPDATE_STEP) {
+            switch (msg.what) {
 
-                showNotification();
+                //StepCounter传感器步数更新通知
+                case MSG_WHAT_STEP_COUNTER_THREAD:
 
+                    showNotification(stepCounter);
+
+                    break;
+
+                //StepDetector传感器步数更新通知
+                case MSG_WHAT_STEP_DETECTOR_THREAD:
+
+                    showNotification(stepDetector);
+
+                    break;
+
+                //加速度传感器步数更新通知
+                case MSG_WHAT_STEP_ACCELEROMETER_THREAD:
+
+                    showNotification(stepAccelerometer);
+
+                    break;
+
+                default:
+                    break;
             }
+
         }
     };
 
@@ -85,6 +123,89 @@ public class PedometerService extends Service {
         super.onCreate();
 
         Log.i(TAG, "服务创建");
+
+        //服务启动
+        serviceFlag = true;
+
+        //初始化数据库
+        mId = Utils.getCurrentLoginId(PedometerService.this);
+        mDBHelper = new DBHelper(PedometerService.this, Constant.DB, null, 1);
+        mDB = mDBHelper.getWritableDatabase();
+        mStepInfoDB = new StepInfoDB(mDB);
+
+        //传感器管理器
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+
+        //选择最好的传感器
+        chooseBestSensor();
+
+        //初始化监听器
+        initListener();
+
+        //开始计步
+        startCountingStep();
+
+        //根据不同传感器类型开启不同线程，使用不同步数
+        switch (mSensorType) {
+
+            case Sensor.TYPE_STEP_COUNTER:
+
+                //开启前台服务
+                showNotification(stepCounter);
+
+                //开启StepCounter传感器步数更新线程
+                if (mStepCounterThread == null) {
+                    mStepCounterThread = new StepCounterThread();
+                }
+                mStepCounterThread.start();
+
+                break;
+
+            case Sensor.TYPE_STEP_DETECTOR:
+
+                //得到今天的步数
+                stepDetector = mStepInfoDB.getStepByIdAndDate(mId, new Date(System.currentTimeMillis()));
+
+                //如果今天没有步数记录
+                if (stepDetector == -1) {
+                    mStepInfoDB.insert(mId, new Date(System.currentTimeMillis()), 0);
+                    stepDetector = 0;
+                }
+
+                //开启前台服务
+                showNotification(stepDetector);
+
+                //开启StepDetector传感器步数更新线程
+                if (mStepDetectorThread == null) {
+                    mStepDetectorThread = new StepDetectorThread();
+                }
+                mStepDetectorThread.start();
+
+                break;
+
+            case Sensor.TYPE_ACCELEROMETER:
+
+                //得到今天的步数
+                stepAccelerometer = mStepInfoDB.getStepByIdAndDate(mId, new Date(System.currentTimeMillis()));
+
+                //如果今天没有步数记录
+                if (stepAccelerometer == -1) {
+                    mStepInfoDB.insert(mId, new Date(System.currentTimeMillis()), 0);
+                    stepAccelerometer = 0;
+                }
+
+                //开启前台服务
+                showNotification(stepAccelerometer);
+
+                //开启加速度传感器步数更新线程
+                if (mStepAccelerometerThread == null) {
+                    mStepAccelerometerThread = new StepAccelerometerThread();
+                }
+                mStepAccelerometerThread.start();
+
+                break;
+        }
+
     }
 
     /**
@@ -109,22 +230,8 @@ public class PedometerService extends Service {
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
         Log.i(TAG, "服务启动");
-
-        //传感器管理器
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-
-        //选择最好的传感器
-        chooseBestSensor();
-
-        //初始化监听器
-        initListener();
-
-        //开始计步
-        startCountingStep();
-
-        //显示通知\前台服务
-        showNotification();
 
         return START_STICKY;//粘性服务，在被kill后尝试自动开启
     }
@@ -195,19 +302,31 @@ public class PedometerService extends Service {
         mSensorManager.registerListener(mSensorEventListener, mSensor, SensorManager.SENSOR_DELAY_NORMAL);//注册Listener
         Log.i(TAG, "开始计步");
 
-        //开启步数更新线程
-        mUpdateStepThreadSwitch = true;
-        if (mUpdateStepThread == null) {
-            mUpdateStepThread = new UpdateStepThread();
-        }
-        mUpdateStepThread.start();
+    }
+
+    /**
+     * 停止计步（Service）
+     */
+    private void stopCountingStep() {
+
+        Log.i(TAG, "停止计步");
+
+        mSensorManager.unregisterListener(mSensorEventListener);//取消注册
 
     }
 
     /**
      * 显示通知\前台服务
+     *
+     * @param step 需要传入步数，因为三种传感器计算方式不同
      */
-    private void showNotification() {
+    private void showNotification(int step) {
+
+        //得到当前步数
+        currentStep = step;
+
+        //被观察者数据改变，更新数据
+        StepObservable.getInstance().notifyStepChange(currentStep);
 
         if (mNotificationBuilder == null) {
             mNotificationBuilder = new Notification.Builder(PedometerService.this);
@@ -215,8 +334,8 @@ public class PedometerService extends Service {
             mNotificationBuilder.setSmallIcon(getApplicationInfo().icon);//小图标
         }
 
-        mNotificationBuilder.setContentTitle(steps + getString(R.string.prompt_notification_title_step_pedometer_service));//标题
-        mNotificationBuilder.setContentText(String.format("%.1f", (steps * SCALE_STEP_CALORIES) / 1000) + getString(R.string.prompt_notification_text_calories_pedometer_service));//内容
+        mNotificationBuilder.setContentTitle(step + getString(R.string.prompt_notification_title_step_pedometer_service));//标题
+        mNotificationBuilder.setContentText(String.format("%.1f", (step * SCALE_STEP_CALORIES) / 1000) + getString(R.string.prompt_notification_text_calories_pedometer_service));//内容
 
         //兼容低版本
         if (Build.VERSION.SDK_INT >= 16) {
@@ -227,19 +346,6 @@ public class PedometerService extends Service {
 
         mNotification.flags = Notification.FLAG_NO_CLEAR;//在点击通知后，通知并不会消失
         startForeground(NOTIFICATION_STEP_SERVICE, mNotification);
-
-    }
-
-    /**
-     * 停止计步（Service）
-     */
-    private void stopCountingStep() {
-
-        mSensorManager.unregisterListener(mSensorEventListener);//取消注册
-        Log.i(TAG, "停止计步");
-
-        //停止步数更新线程
-        mUpdateStepThreadSwitch = false;
 
     }
 
@@ -256,52 +362,185 @@ public class PedometerService extends Service {
         //停止前台服务
         stopForeground(true);
 
+        //服务销毁
+        serviceFlag = false;
+
         Log.i(TAG, "服务销毁");
     }
 
     /**
-     * 步数更新线程
+     * StepCounter传感器步数更新线程 TODO
      */
-    class UpdateStepThread extends Thread {
+    class StepCounterThread extends Thread {
+
+        @Override
+        public void run() {
+
+            while (serviceFlag) {
+
+                try {
+
+                    //每1s更新通知栏
+                    sleep(1000);
+
+                    //循环，5s时timeCounter就会变为0
+                    timeCounter++;
+                    timeCounter = timeCounter % 5;
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                //获得今天的步数，即时没有获取到也没有关系，没有获取到返回-1，误差很小
+                int step = mStepInfoDB.getStepByIdAndDate(mId, new Date(System.currentTimeMillis()));
+
+                //如果stepCounterHistory还未初始化（即等于-1），将系统总步数赋给它
+                if (stepCounterHistory == -1) {
+                    stepCounterHistory = stepCounterRaw - step;//核心算法：这个算法很巧妙，即使算出的结果为负数，也是我们需要的
+                    Log.i(TAG, "stepCounterHistory---->" + stepCounterHistory);
+                }
+
+                //实际走的步数等于总步数减去历史步数
+                stepCounter = stepCounterRaw - stepCounterHistory;
+
+                Log.i(TAG, "stepCounter---->" + stepCounter);
+
+                //更新通知栏
+                mHandler.sendEmptyMessage(MSG_WHAT_STEP_COUNTER_THREAD);
+
+                //每过5s，更新数据库
+                if (timeCounter == 0) {
+
+                    //写入数据到数据库中
+                    boolean updateFlag = mStepInfoDB.update(mId, new Date(System.currentTimeMillis()), stepCounter);
+
+                    //如果更新失败，说明日期已改变
+                    if (!updateFlag) {
+                        mStepInfoDB.insert(mId, new Date(System.currentTimeMillis()), 0);//添加新数据
+                        stepCounterHistory = -1;//重置历史步数
+                    }
+
+                }
+
+            }
+
+        }
+    }
+
+    /**
+     * StepDetector传感器步数更新线程
+     */
+    class StepDetectorThread extends Thread {
+
+        @Override
+        public void run() {
+
+            while (serviceFlag) {
+
+                try {
+
+                    //每1s更新通知栏
+                    sleep(1000);
+                    mHandler.sendEmptyMessage(MSG_WHAT_STEP_DETECTOR_THREAD);
+
+                    //循环，5s时timeCounter就会变为0
+                    timeCounter++;
+                    timeCounter = timeCounter % 5;
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                //每过5s，更新数据库
+                if (timeCounter == 0) {
+
+                    //写入数据到数据库中
+                    boolean updateFlag = mStepInfoDB.update(mId, new Date(System.currentTimeMillis()), stepDetector);
+
+                    //如果更新失败，说明日期已改变
+                    if (!updateFlag) {
+                        mStepInfoDB.insert(mId, new Date(System.currentTimeMillis()), 0);//添加新数据
+                        stepDetector = 0;//步数重置为0
+                    }
+
+                }
+
+            }
+
+        }
+    }
+
+    /**
+     * 加速度传感器步数更新线程
+     */
+    class StepAccelerometerThread extends Thread {
 
         @Override
         public void run() {
 
             //无限循环
-            while (mUpdateStepThreadSwitch) {
+            while (serviceFlag) {
 
                 try {
 
-                    sleep(TIME_INTERVAL_UPDATE_STEP_THREAD);
-                    mHandler.sendEmptyMessage(MSG_WHAT_UPDATE_STEP);
+                    //每1s更新通知栏
+                    sleep(1000);
+                    mHandler.sendEmptyMessage(MSG_WHAT_STEP_ACCELEROMETER_THREAD);
+
+                    //循环，5s时timeCounter就会变为0
+                    timeCounter++;
+                    timeCounter = timeCounter % 5;
 
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+
+                //每过5s，更新数据库
+                if (timeCounter == 0) {
+
+                    //写入数据到数据库中
+                    boolean updateFlag = mStepInfoDB.update(mId, new Date(System.currentTimeMillis()), stepAccelerometer);
+
+                    //如果更新失败，说明日期已改变
+                    if (!updateFlag) {
+                        mStepInfoDB.insert(mId, new Date(System.currentTimeMillis()), 0);//添加新数据
+                        stepAccelerometer = 0;//步数重置为0
+                    }
+                }
+
             }
         }
     }
 
     /**
-     * 步数写入数据库线程
+     * 步数改变时调用
+     *
+     * @param step
      */
-    class WriteStepToDBThread extends Thread {
+    public void stepChange(int step) {
 
-        @Override
-        public void run() {
+        //判断当前传感器类型，不同传感器要区别对待
+        switch (mSensorType) {
 
-            //无限循环
-            while (mWriteStepToDBThreadSwitch) {
+            //StepCounter   步行总数,最理想的健康跟踪传感器，实时返回步数总数，重启手机时清空
+            case Sensor.TYPE_STEP_COUNTER:
 
-                try {
+                break;
 
-                    sleep(TIME_INTERVAL_WRITE_STEP_TO_DBTHREAD);
-                    mHandler.sendEmptyMessage(MSG_WHAT_WRITE_STEP_TO_DB);
+            //StepDetector  步数探测器，第二选择,适合航迹推算，每走一步+1
+            case Sensor.TYPE_STEP_DETECTOR:
 
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
+                break;
+
+            //Accelerometer  加速度传感器，最差选择，软件层算法模拟，精度最低，但普及率最高
+            case Sensor.TYPE_ACCELEROMETER:
+
+                break;
+
+            default:
+                break;
         }
+
     }
+
 }
