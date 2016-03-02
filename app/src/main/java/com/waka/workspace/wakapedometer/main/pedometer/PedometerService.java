@@ -20,7 +20,7 @@ import java.sql.Date;
 
 import com.waka.workspace.wakapedometer.Constant;
 import com.waka.workspace.wakapedometer.R;
-import com.waka.workspace.wakapedometer.Utils;
+import com.waka.workspace.wakapedometer.utils.LoginInfoUtil;
 import com.waka.workspace.wakapedometer.database.DBHelper;
 import com.waka.workspace.wakapedometer.database.StepInfoDB;
 import com.waka.workspace.wakapedometer.main.pedometer.steplistener.AccelerometerListener;
@@ -128,7 +128,7 @@ public class PedometerService extends Service {
         serviceFlag = true;
 
         //初始化数据库
-        mId = Utils.getCurrentLoginId(PedometerService.this);
+        mId = LoginInfoUtil.getCurrentLoginId(PedometerService.this);
         mDBHelper = new DBHelper(PedometerService.this, Constant.DB, null, 1);
         mDB = mDBHelper.getWritableDatabase();
         mStepInfoDB = new StepInfoDB(mDB);

@@ -1,40 +1,59 @@
 package com.waka.workspace.wakapedometer.main.pedometer;
 
+import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.app.Activity;
-import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationSet;
 import android.widget.Button;
-import android.widget.Toast;
+import android.widget.LinearLayout;
 
+import com.waka.workspace.wakapedometer.Constant;
 import com.waka.workspace.wakapedometer.R;
+import com.waka.workspace.wakapedometer.utils.DensityUtil;
+import com.waka.workspace.wakapedometer.utils.LoginInfoUtil;
 import com.waka.workspace.wakapedometer.customview.RoundProgressBar;
+import com.waka.workspace.wakapedometer.database.DBHelper;
+import com.waka.workspace.wakapedometer.database.StepInfoDB;
 
+import java.sql.Date;
 import java.util.Observable;
 import java.util.Observer;
 
-import javax.security.auth.Subject;
-
 /**
  * PedometerFragment
- * <p/>
+ * <p>
  * 观察者，需要根据步数变化动态更新UI
- * <p/>
+ * <p>
  * Created by waka on 2016/2/16.
  */
 public class PedometerFragment extends Fragment implements View.OnClickListener, Observer {
 
     private static final String TAG = "PedometerFragment";
 
-    private RoundProgressBar roundProgressBar;
+    private CardView cardView;
+    private LinearLayout layoutProgressBar;
+    private int layoutHeightOriginal;//布局原来的高度
+    private RoundProgressBar roundProgressBar;//自定义圆形进度条
+    private FloatingActionButton fabCardView;//FAB
+    private static final int FAB_UP = 1;//FAB指向上
+    private static final int FAB_DOWN = 2;//FAB指向下
+
     private Button btnAdd;
+
+    //数据库操作类
+    private int mId;//当前用户id
+    private DBHelper mDBHelper;
+    private SQLiteDatabase mDB;
+    private StepInfoDB mStepInfoDB;
 
     /**
      * 构造方法
@@ -93,7 +112,17 @@ public class PedometerFragment extends Fragment implements View.OnClickListener,
      * @param view
      */
     private void initView(View view) {
+
+        cardView = (CardView) view.findViewById(R.id.cardView);
+
+        layoutProgressBar = (LinearLayout) view.findViewById(R.id.layoutProgressBar);
+        layoutHeightOriginal = layoutProgressBar.getHeight();//获得布局原来的高度
+
         roundProgressBar = (RoundProgressBar) view.findViewById(R.id.roundProgressBar);
+
+        fabCardView = (FloatingActionButton) view.findViewById(R.id.fabCardView);
+        fabCardView.setTag(FAB_DOWN);//设置向下标志，用来判断该指上还是指下
+
         btnAdd = (Button) view.findViewById(R.id.btnAdd);
     }
 
@@ -102,6 +131,11 @@ public class PedometerFragment extends Fragment implements View.OnClickListener,
      */
     private void initData() {
 
+        //初始化数据库
+        mId = LoginInfoUtil.getCurrentLoginId(PedometerFragment.this.getActivity());
+        mDBHelper = new DBHelper(PedometerFragment.this.getActivity(), Constant.DB, null, 1);
+        mDB = mDBHelper.getWritableDatabase();
+        mStepInfoDB = new StepInfoDB(mDB);
     }
 
     /**
@@ -118,6 +152,8 @@ public class PedometerFragment extends Fragment implements View.OnClickListener,
 
             }
         });
+
+        fabCardView.setOnClickListener(this);
     }
 
     /**
@@ -127,7 +163,42 @@ public class PedometerFragment extends Fragment implements View.OnClickListener,
      */
     @Override
     public void onClick(View v) {
+
         switch (v.getId()) {
+
+            case R.id.fabCardView:
+
+                if ((int) fabCardView.getTag() == FAB_DOWN) {
+
+                    //高度变化动画
+                    ObjectAnimator heightAnimator = ObjectAnimator.ofInt(layoutProgressBar, "minimumHeight", layoutHeightOriginal, DensityUtil.dip2px(PedometerFragment.this.getActivity(), 440));
+                    //FAB旋转动画
+                    ObjectAnimator rotateAnimator = ObjectAnimator.ofFloat(fabCardView, "rotation", 0f, 180f);
+                    //组合动画
+                    AnimatorSet animatorSet = new AnimatorSet();
+                    animatorSet.play(rotateAnimator).with(heightAnimator);
+                    animatorSet.setDuration(500);
+                    animatorSet.start();
+
+                    fabCardView.setTag(FAB_UP);
+
+                } else {
+
+                    //高度变化动画
+                    ObjectAnimator heightAnimator = ObjectAnimator.ofInt(layoutProgressBar, "minimumHeight", DensityUtil.dip2px(PedometerFragment.this.getActivity(), 440), layoutHeightOriginal);
+                    //FAB旋转动画
+                    ObjectAnimator rotateAnimator = ObjectAnimator.ofFloat(fabCardView, "rotation", 180f, 360f);
+                    //组合动画
+                    AnimatorSet animatorSet = new AnimatorSet();
+                    animatorSet.play(rotateAnimator).with(heightAnimator);
+                    animatorSet.setDuration(500);
+                    animatorSet.start();
+
+                    fabCardView.setTag(FAB_DOWN);
+
+                }
+
+                break;
 
             default:
                 break;
@@ -140,6 +211,9 @@ public class PedometerFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onResume() {
         super.onResume();
+
+        //设置步数
+        roundProgressBar.setProgress(mStepInfoDB.getStepByIdAndDate(mId, new Date(System.currentTimeMillis())));
 
         //观察者往被观察者中添加订阅事件
         StepObservable.getInstance().addObserver(this);
@@ -171,6 +245,7 @@ public class PedometerFragment extends Fragment implements View.OnClickListener,
         animator.setDuration(500);
         animator.start();
 
+//        Snackbar.make(roundProgressBar, "step=" + step, Snackbar.LENGTH_SHORT).show();
         Log.i(TAG, "step=" + step);
     }
 }

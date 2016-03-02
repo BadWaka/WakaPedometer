@@ -1,14 +1,17 @@
-package com.waka.workspace.wakapedometer;
+package com.waka.workspace.wakapedometer.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.waka.workspace.wakapedometer.Constant;
+
 /**
- * 工具类
+ * 登录信息工具类
+ * <p>
  * Created by waka on 2016/2/16.
  */
-public class Utils {
+public class LoginInfoUtil {
 
     /**
      * 设置登录Cookie和当前登录人员id

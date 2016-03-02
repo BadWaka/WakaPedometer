@@ -1,39 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".main.pedometer.PedometerFragment">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="300dp"
-            android:gravity="center">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            <com.waka.workspace.wakapedometer.customview.RoundProgressBar
-                android:id="@+id/roundProgressBar"
-                android:layout_width="200dp"
-                android:layout_height="200dp"
-                app:max="10000"
-                app:roundColor="@android:color/white"
-                app:roundProgressColor="@color/colorAccent"
-                app:roundWidth="25dp"
-                app:textColor="@color/colorPrimary"
-                app:textSize="20sp" />
+            <android.support.v7.widget.CardView
+                android:id="@+id/cardView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/activity_horizontal_margin"
+                app:cardCornerRadius="5dp">
+
+                <LinearLayout
+                    android:id="@+id/layoutProgressBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:padding="@dimen/activity_double_margin">
+
+                    <com.waka.workspace.wakapedometer.customview.RoundProgressBar
+                        android:id="@+id/roundProgressBar"
+                        android:layout_width="180dp"
+                        android:layout_height="180dp"
+                        app:max="10000"
+                        app:roundColor="@color/colorPrimary"
+                        app:roundProgressColor="#00B2EE"
+                        app:roundWidth="25dp"
+                        app:textColor="@color/colorAccent"
+                        app:textSize="36sp" />
+                </LinearLayout>
+
+            </android.support.v7.widget.CardView>
+
+            <Button
+                android:id="@+id/btnAdd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add" />
         </LinearLayout>
+    </ScrollView>
 
-        <Button
-            android:id="@+id/btnAdd"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Add" />
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabCardView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/ic_keyboard_arrow_down_white_18dp"
+        android:tint="@color/colorAccent"
+        app:backgroundTint="@android:color/white"
+        app:fabSize="mini"
+        app:layout_anchor="@id/cardView"
+        app:layout_anchorGravity="bottom|center" />
 
-    </LinearLayout>
-
-</FrameLayout>
+</android.support.design.widget.CoordinatorLayout>

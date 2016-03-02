@@ -1,9 +1,7 @@
 package com.waka.workspace.wakapedometer.login;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,7 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.waka.workspace.wakapedometer.Constant;
-import com.waka.workspace.wakapedometer.Utils;
+import com.waka.workspace.wakapedometer.utils.LoginInfoUtil;
 import com.waka.workspace.wakapedometer.database.model.PersonModel;
 import com.waka.workspace.wakapedometer.main.MainActivity;
 import com.waka.workspace.wakapedometer.R;
@@ -112,7 +110,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                 int id = personModel.getId();
 
                 //在SharedPreferences中设置登录Cookie和当前登录人员id
-                if (!Utils.setLoginCookieAndId(getApplicationContext(), "我是loginCookie", id)) {
+                if (!LoginInfoUtil.setLoginCookieAndId(getApplicationContext(), "我是loginCookie", id)) {
                     Log.e(TAG, "写入SharedPreferences失败");
                     return;
                 }

@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import com.waka.workspace.wakapedometer.Constant;
 import com.waka.workspace.wakapedometer.R;
-import com.waka.workspace.wakapedometer.Utils;
+import com.waka.workspace.wakapedometer.utils.LoginInfoUtil;
 import com.waka.workspace.wakapedometer.database.DBHelper;
 import com.waka.workspace.wakapedometer.login.SignInActivity;
 import com.waka.workspace.wakapedometer.login.SignUpActivity;
@@ -54,7 +54,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     private void checkOutLoginCookie() {
 
         //得到loginCookie
-        String loginCookie = Utils.getLoginCookie(getApplicationContext());
+        String loginCookie = LoginInfoUtil.getLoginCookie(getApplicationContext());
 
         //如果loginCookie不为空
         if (!loginCookie.isEmpty()) {

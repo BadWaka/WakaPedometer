@@ -14,7 +14,7 @@ import com.waka.workspace.wakapedometer.R;
 
 /**
  * 自定义圆形进度条
- * <p>
+ * <p/>
  * Created by waka on 2016/2/29.
  */
 public class RoundProgressBar extends View {

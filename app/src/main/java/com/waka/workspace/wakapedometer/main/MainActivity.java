@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -28,7 +27,7 @@ import android.widget.TextView;
 import com.waka.workspace.wakapedometer.Constant;
 import com.waka.workspace.wakapedometer.MyFragmentPagerAdapter;
 import com.waka.workspace.wakapedometer.R;
-import com.waka.workspace.wakapedometer.Utils;
+import com.waka.workspace.wakapedometer.utils.LoginInfoUtil;
 import com.waka.workspace.wakapedometer.database.DBHelper;
 import com.waka.workspace.wakapedometer.database.PersonDB;
 import com.waka.workspace.wakapedometer.database.model.PersonModel;
@@ -124,8 +123,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mPersonDB = new PersonDB(mDB);
 
         //得到人员信息
-        mId = Utils.getCurrentLoginId(getApplicationContext());
+        mId = LoginInfoUtil.getCurrentLoginId(getApplicationContext());
         mPersonModel = mPersonDB.queryById(mId);
+
+        //开启计步服务
+        Intent intentStart = new Intent(MainActivity.this, PedometerService.class);
+        startService(intentStart);
 
         //侧边栏
         tvNickName.setText(mPersonModel.getNickName());
@@ -297,12 +300,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //登出
             case R.id.nav_logout:
 
+                //关闭侧边栏
+                drawerLayout.closeDrawer(GravityCompat.START);
+
                 new AlertDialog.Builder(MainActivity.this).setMessage(R.string.prompt_confirm_logout_main_activity).setPositiveButton(R.string.btn_confirm_main_activity, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
                         //将LoginCookie设为""，当前登录人员id设为-1
-                        Utils.setLoginCookieAndId(MainActivity.this, "", -1);
+                        LoginInfoUtil.setLoginCookieAndId(MainActivity.this, "", -1);
 
                         //跳转到SplashActivity
                         Intent intent = new Intent(MainActivity.this, SplashActivity.class);
@@ -328,8 +334,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
         }
 
-        //关闭侧边栏
-        drawerLayout.closeDrawer(GravityCompat.START);
+        //如果侧边栏是开启状态
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            //关闭侧边栏
+            drawerLayout.closeDrawer(GravityCompat.START);
+        }
 
         return true;
     }
