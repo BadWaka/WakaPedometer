@@ -23,6 +23,7 @@ public class Constant {
     public static final int REQUEST_CODE_SIGN_IN_ACTIVITY = 10001;//登录界面，SignInActivity
     public static final int REQUEST_CODE_SIGN_UP_ACTIVITY = 10002;//注册界面，SignUpActivity
     public static final int REQUEST_CODE_MAIN_ACTIVITY = 10003;//主界面，MainActivity
+    public static final int REQUEST_CODE_MINE_ACTIVITY = 10004;//个人中心界面，MineActivity
 
     /**
      * DataBase

@@ -27,18 +27,37 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
+                    android:orientation="vertical"
                     android:padding="@dimen/activity_double_margin">
 
                     <com.waka.workspace.wakapedometer.customview.RoundProgressBar
                         android:id="@+id/roundProgressBar"
-                        android:layout_width="180dp"
-                        android:layout_height="180dp"
+                        android:layout_width="240dp"
+                        android:layout_height="240dp"
                         app:max="10000"
                         app:roundColor="@color/colorPrimary"
                         app:roundProgressColor="#00B2EE"
                         app:roundWidth="25dp"
                         app:textColor="@color/colorAccent"
                         app:textSize="36sp" />
+
+                    <!--输入最大步数-->
+                    <android.support.design.widget.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/activity_double_margin"
+                        android:theme="@style/AppTheme">
+
+                        <EditText
+                            android:id="@+id/etMaxStep"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/prompt_input_max_step_pedometer_fragment"
+                            android:numeric="integer"
+                            android:singleLine="true"
+                            android:visibility="gone" />
+                    </android.support.design.widget.TextInputLayout>
+
                 </LinearLayout>
 
             </android.support.v7.widget.CardView>

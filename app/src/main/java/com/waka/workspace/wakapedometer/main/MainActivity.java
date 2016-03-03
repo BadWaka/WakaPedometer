@@ -2,10 +2,12 @@ package com.waka.workspace.wakapedometer.main;
 
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
+import android.animation.AnimatorListenerAdapter;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.net.Uri;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -24,9 +26,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.waka.workspace.wakapedometer.Constant;
 import com.waka.workspace.wakapedometer.MyFragmentPagerAdapter;
 import com.waka.workspace.wakapedometer.R;
+import com.waka.workspace.wakapedometer.mine.MineActivity;
 import com.waka.workspace.wakapedometer.utils.LoginInfoUtil;
 import com.waka.workspace.wakapedometer.database.DBHelper;
 import com.waka.workspace.wakapedometer.database.PersonDB;
@@ -56,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private View headerView;//侧边栏头View
     private ImageView imgHeadIcon;//头像
     private TextView tvNickName;//昵称
+    private ImageView imgLogout;//登出图标
 
     //viewPager和Fragment
     private ViewPager viewPager;
@@ -66,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private DiscoveryFragment discoveryFragment;
 
     //底部按钮栏
+    private LinearLayout layoutBottomTab;
     private LinearLayout layoutPedometer, layoutHistory, layoutDiscovery;
     private ImageView imgPedometer, imgHistory, imgDiscovery;
     private TextView tvPedometer, tvHistory, tvDiscovery;
@@ -96,11 +104,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         headerView = navigationView.getHeaderView(0);
         imgHeadIcon = (ImageView) headerView.findViewById(R.id.imgHeadIcon);
         tvNickName = (TextView) headerView.findViewById(R.id.tvNickName);
+        imgLogout = (ImageView) headerView.findViewById(R.id.imgLogout);
 
         //viewPager和Fragment
         viewPager = (ViewPager) findViewById(R.id.viewPager);
 
         //底部按钮栏
+        layoutBottomTab = (LinearLayout) findViewById(R.id.layoutBottomTab);
         layoutPedometer = (LinearLayout) findViewById(R.id.layoutPedometer);
         layoutHistory = (LinearLayout) findViewById(R.id.layoutHistory);
         layoutDiscovery = (LinearLayout) findViewById(R.id.layoutDiscovery);
@@ -151,6 +161,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     /*initEvent*/
     private void initEvent() {
 
+        //侧滑菜单头像和昵称监听
+        imgHeadIcon.setOnClickListener(this);
+        tvNickName.setOnClickListener(this);
+
+        //侧滑菜单登出监听
+        imgLogout.setOnClickListener(this);
+
         //注册导航栏选择监听事件
         navigationView.setNavigationItemSelectedListener(this);
 
@@ -171,6 +188,64 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+
+            //侧滑菜单头像监听
+            case R.id.imgHeadIcon:
+
+                //如果侧边栏是开启状态
+                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    //关闭侧边栏
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                }
+
+                Intent intentMine1 = new Intent(MainActivity.this, MineActivity.class);
+                startActivityForResult(intentMine1, Constant.REQUEST_CODE_MINE_ACTIVITY);
+
+                break;
+
+            //侧滑菜单昵称监听
+            case R.id.tvNickName:
+
+                //如果侧边栏是开启状态
+                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    //关闭侧边栏
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                }
+
+                Intent intentMine2 = new Intent(MainActivity.this, MineActivity.class);
+                startActivityForResult(intentMine2, Constant.REQUEST_CODE_MINE_ACTIVITY);
+
+                break;
+
+            //侧滑菜单登出
+            case R.id.imgLogout:
+
+                new AlertDialog.Builder(MainActivity.this).setMessage(R.string.prompt_confirm_logout_main_activity).setPositiveButton(R.string.btn_confirm_main_activity, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        //将LoginCookie设为""，当前登录人员id设为-1
+                        LoginInfoUtil.setLoginCookieAndId(MainActivity.this, "", -1);
+
+                        //跳转到SplashActivity
+                        Intent intent = new Intent(MainActivity.this, SplashActivity.class);
+                        startActivity(intent);
+
+                        //关闭计步服务
+                        Intent intentStop = new Intent(MainActivity.this, PedometerService.class);
+                        stopService(intentStop);
+
+                        finish();
+
+                    }
+                }).setNegativeButton(R.string.btn_cancel_main_activity, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                }).show();
+
+                break;
 
             case R.id.layoutPedometer:
                 viewPager.setCurrentItem(0);
@@ -222,6 +297,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Animator animator = AnimatorInflater.loadAnimator(MainActivity.this, R.animator.anim_rotation_circle);
         switch (tabPosition) {
             case 0:
+
                 //设置旋转动画
                 animator.setTarget(imgPedometer);
                 animator.setInterpolator(new AnticipateOvershootInterpolator());
@@ -236,6 +312,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 imgDiscovery.setColorFilter(Color.WHITE);
                 break;
             case 1:
+
                 //设置旋转动画
                 animator.setTarget(imgHistory);
                 animator.setInterpolator(new AnticipateOvershootInterpolator());
@@ -294,39 +371,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 Intent intentStop = new Intent(MainActivity.this, PedometerService.class);
                 stopService(intentStop);
-
-                break;
-
-            //登出
-            case R.id.nav_logout:
-
-                //关闭侧边栏
-                drawerLayout.closeDrawer(GravityCompat.START);
-
-                new AlertDialog.Builder(MainActivity.this).setMessage(R.string.prompt_confirm_logout_main_activity).setPositiveButton(R.string.btn_confirm_main_activity, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                        //将LoginCookie设为""，当前登录人员id设为-1
-                        LoginInfoUtil.setLoginCookieAndId(MainActivity.this, "", -1);
-
-                        //跳转到SplashActivity
-                        Intent intent = new Intent(MainActivity.this, SplashActivity.class);
-                        startActivity(intent);
-
-                        //关闭计步服务
-                        Intent intentStop = new Intent(MainActivity.this, PedometerService.class);
-                        stopService(intentStop);
-
-                        finish();
-
-                    }
-                }).setNegativeButton(R.string.btn_cancel_main_activity, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                }).show();
 
                 break;
 

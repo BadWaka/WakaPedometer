@@ -1,5 +1,7 @@
 package com.waka.workspace.wakapedometer.main.pedometer;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.database.sqlite.SQLiteDatabase;
@@ -12,8 +14,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AnimationSet;
+import android.view.animation.AnticipateInterpolator;
+import android.view.animation.AnticipateOvershootInterpolator;
+import android.view.animation.BounceInterpolator;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.OvershootInterpolator;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import com.waka.workspace.wakapedometer.Constant;
@@ -30,22 +39,25 @@ import java.util.Observer;
 
 /**
  * PedometerFragment
- * <p>
+ * <p/>
  * 观察者，需要根据步数变化动态更新UI
- * <p>
+ * <p/>
  * Created by waka on 2016/2/16.
  */
 public class PedometerFragment extends Fragment implements View.OnClickListener, Observer {
 
     private static final String TAG = "PedometerFragment";
 
+    //计步CardView
     private CardView cardView;
     private LinearLayout layoutProgressBar;
     private int layoutHeightOriginal;//布局原来的高度
     private RoundProgressBar roundProgressBar;//自定义圆形进度条
+    private EditText etMaxStep;//设置最大步数栏，默认隐藏
     private FloatingActionButton fabCardView;//FAB
     private static final int FAB_UP = 1;//FAB指向上
     private static final int FAB_DOWN = 2;//FAB指向下
+
 
     private Button btnAdd;
 
@@ -120,6 +132,8 @@ public class PedometerFragment extends Fragment implements View.OnClickListener,
 
         roundProgressBar = (RoundProgressBar) view.findViewById(R.id.roundProgressBar);
 
+        etMaxStep = (EditText) view.findViewById(R.id.etMaxStep);
+
         fabCardView = (FloatingActionButton) view.findViewById(R.id.fabCardView);
         fabCardView.setTag(FAB_DOWN);//设置向下标志，用来判断该指上还是指下
 
@@ -177,12 +191,37 @@ public class PedometerFragment extends Fragment implements View.OnClickListener,
                     //组合动画
                     AnimatorSet animatorSet = new AnimatorSet();
                     animatorSet.play(rotateAnimator).with(heightAnimator);
-                    animatorSet.setDuration(500);
+                    animatorSet.setDuration(800);
+//                    animatorSet.setInterpolator(new AnticipateOvershootInterpolator());
                     animatorSet.start();
+                    animatorSet.addListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            super.onAnimationEnd(animation);
+                            etMaxStep.setVisibility(View.VISIBLE);
+                            etMaxStep.setText("" + roundProgressBar.getMax());
+                        }
+                    });
 
                     fabCardView.setTag(FAB_UP);
 
                 } else {
+
+                    //如果etMaxStep不为空
+                    if (!etMaxStep.getText().toString().isEmpty()) {
+
+                        //如果输入的最大步数大于步数
+                        if (Integer.valueOf(etMaxStep.getText().toString()) > roundProgressBar.getProgress()) {
+
+                            //设置最大步数
+                            roundProgressBar.setMax(Integer.valueOf(etMaxStep.getText().toString()));
+                        } else {
+
+                            etMaxStep.setError("最大步数小于当前步数！");
+                            return;
+                        }
+                    }
+                    etMaxStep.setVisibility(View.GONE);
 
                     //高度变化动画
                     ObjectAnimator heightAnimator = ObjectAnimator.ofInt(layoutProgressBar, "minimumHeight", DensityUtil.dip2px(PedometerFragment.this.getActivity(), 440), layoutHeightOriginal);
@@ -191,7 +230,8 @@ public class PedometerFragment extends Fragment implements View.OnClickListener,
                     //组合动画
                     AnimatorSet animatorSet = new AnimatorSet();
                     animatorSet.play(rotateAnimator).with(heightAnimator);
-                    animatorSet.setDuration(500);
+                    animatorSet.setDuration(1000);
+                    animatorSet.setInterpolator(new AnticipateOvershootInterpolator());
                     animatorSet.start();
 
                     fabCardView.setTag(FAB_DOWN);

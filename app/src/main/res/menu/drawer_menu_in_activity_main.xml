@@ -29,9 +29,4 @@
         </menu>
     </item>
 
-    <item
-        android:id="@+id/nav_logout"
-        android:icon="@mipmap/ic_exit_to_app_white_24dp"
-        android:title="@string/nav_logout_main_activity" />
-
 </menu>

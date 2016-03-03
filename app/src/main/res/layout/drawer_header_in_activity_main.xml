@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/nav_header_height"
     android:background="@drawable/side_nav_bar"
@@ -15,15 +15,24 @@
         android:id="@+id/imgHeadIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:src="@android:drawable/sym_def_app_icon" />
 
     <TextView
         android:id="@+id/tvNickName"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/imgHeadIcon"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:text="NickName"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
-</LinearLayout>
+    <ImageView
+        android:id="@+id/imgLogout"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignParentRight="true"
+        android:src="@mipmap/ic_exit_to_app_white_24dp" />
+
+</RelativeLayout>

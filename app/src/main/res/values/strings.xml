@@ -37,6 +37,7 @@
     <string name="nav_title_service_switch_main_activity">后台开关</string>
     <string name="nav_start_service_main_activity">开始计步服务</string>
     <string name="nav_stop_service_main_activity">停止计步服务</string>
+    <string name="nav_mine_main_activity">个人中心</string>
     <string name="nav_logout_main_activity">退出登录</string>
     <string name="prompt_confirm_logout_main_activity">确定要退出登录吗？</string>
     <string name="btn_confirm_main_activity">确定</string>
@@ -46,6 +47,12 @@
     <string name="prompt_notification_ticker_pedometer_service">开始计步</string>
     <string name="prompt_notification_title_step_pedometer_service">步</string>
     <string name="prompt_notification_text_calories_pedometer_service">千卡</string>
+    <!--PedometerFragment-->
+    <string name="prompt_input_max_step_pedometer_fragment">请输入最大步数</string>
 
+    <!--MineActivity-->
+    <string name="title_activity_mine">编辑个人信息</string>
+    <string name="btn_change_headicon_mine_activity">修改头像</string>
+    <string name="prompt_nickname_mine_activity">昵称</string>
 
 </resources>
