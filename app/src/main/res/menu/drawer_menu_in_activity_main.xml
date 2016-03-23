@@ -16,17 +16,26 @@
             android:title="Slideshow" />
     </group>
 
+
     <item android:title="@string/nav_title_service_switch_main_activity">
         <menu>
-            <item
-                android:id="@+id/nav_start_service"
-                android:icon="@mipmap/ic_directions_run_white_24dp"
-                android:title="@string/nav_start_service_main_activity" />
-            <item
-                android:id="@+id/nav_stop_service"
-                android:icon="@mipmap/ic_power_settings_new_white_24dp"
-                android:title="@string/nav_stop_service_main_activity" />
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/nav_start_service"
+                    android:icon="@mipmap/ic_directions_run_white_24dp"
+                    android:title="@string/nav_start_service_main_activity" />
+                <item
+                    android:id="@+id/nav_stop_service"
+                    android:icon="@mipmap/ic_power_settings_new_white_24dp"
+                    android:title="@string/nav_stop_service_main_activity" />
+            </group>
         </menu>
     </item>
+
+
+    <item
+        android:id="@+id/nav_get_max_memory"
+        android:icon="@mipmap/ic_launcher"
+        android:title="得到应用程序最大内存" />
 
 </menu>

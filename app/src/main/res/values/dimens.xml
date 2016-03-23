@@ -1,19 +1,11 @@
 <resources>
     <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="activity_half_margin">8dp</dimen>
-    <dimen name="activity_double_margin">32dp</dimen>
 
     <!--侧边栏-->
     <dimen name="nav_header_vertical_spacing">16dp</dimen>
     <dimen name="nav_header_height">160dp</dimen>
 
-    <!--图标大小-->
-    <dimen name="icon_small">24dp</dimen>
-    <dimen name="icon_middle">36dp</dimen>
-    <dimen name="icon_large">48dp</dimen>
-
+    <!--MainActivity-->
     <!--底部按钮栏高度-->
     <dimen name="tab_height">56dp</dimen>
     <!--底部按钮栏文字高度-->
@@ -24,4 +16,24 @@
     <dimen name="text_size_title">20sp</dimen>
     <dimen name="text_size_sub_head">16sp</dimen>
     <dimen name="text_size_body">14sp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="app_bar_height">180dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
+
+    <!--通用-->
+    <!--间距-->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="activity_half_margin">8dp</dimen>
+    <dimen name="activity_double_margin">32dp</dimen>
+    <!--图标大小-->
+    <dimen name="icon_small">24dp</dimen>
+    <dimen name="icon_middle">36dp</dimen>
+    <dimen name="icon_large">48dp</dimen>
+    <dimen name="icon_super_large">96dp</dimen>
+
+    <!--个人中心 MineActivity-->
+    <!--头像栏高度-->
+    <dimen name="layout_headicon_height">112dp</dimen>
+    <dimen name="layout_normal_height">56dp</dimen>
 </resources>

@@ -64,7 +64,7 @@
         android:theme="@style/AppTheme">
 
         <EditText
-            android:id="@+id/etNickName"
+            android:id="@+id/et_nickname"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/prompt_nickname_sign_up_activity"

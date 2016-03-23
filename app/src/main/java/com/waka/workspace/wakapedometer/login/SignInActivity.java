@@ -11,12 +11,12 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.waka.workspace.wakapedometer.Constant;
-import com.waka.workspace.wakapedometer.utils.LoginInfoUtil;
-import com.waka.workspace.wakapedometer.database.model.PersonModel;
-import com.waka.workspace.wakapedometer.main.MainActivity;
 import com.waka.workspace.wakapedometer.R;
+import com.waka.workspace.wakapedometer.MainActivity;
+import com.waka.workspace.wakapedometer.utils.LoginInfoUtil;
+import com.waka.workspace.wakapedometer.database.bean.PersonBean;
 import com.waka.workspace.wakapedometer.database.DBHelper;
-import com.waka.workspace.wakapedometer.database.PersonDB;
+import com.waka.workspace.wakapedometer.database.PersonDBHelper;
 
 /**
  * 登录Activity
@@ -28,7 +28,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
     //数据库
     private DBHelper mDBHelper;
     private SQLiteDatabase mDB;
-    private PersonDB mPersonDB;
+    private PersonDBHelper mPersonDBHelper;
 
     //控件
     private AutoCompleteTextView actvAccount;
@@ -58,7 +58,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         //初始化数据库
         mDBHelper = new DBHelper(SignInActivity.this, Constant.DB, null, 1);
         mDB = mDBHelper.getWritableDatabase();
-        mPersonDB = new PersonDB(mDB);
+        mPersonDBHelper = new PersonDBHelper(mDB);
 
     }
 
@@ -91,7 +91,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                 }
 
                 //判断账户是否存在
-                boolean existFlag = mPersonDB.isExistAccount(account);
+                boolean existFlag = mPersonDBHelper.isExistAccount(account);
                 if (!existFlag) {
                     actvAccount.setError(getString(R.string.prompt_account_not_exist_sign_in_activity));
                     actvAccount.requestFocus();
@@ -99,15 +99,15 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                 }
 
                 //判断用户名密码是否匹配
-                boolean matchFlag = mPersonDB.isMatching(account, password);
+                boolean matchFlag = mPersonDBHelper.isMatching(account, password);
                 if (!matchFlag) {
                     etPassword.setError(getString(R.string.prompt_password_error_sign_in_activity));
                     etPassword.requestFocus();
                     return;
                 }
 
-                PersonModel personModel = mPersonDB.queryByAccount(account);
-                int id = personModel.getId();
+                PersonBean personBean = mPersonDBHelper.queryByAccount(account);
+                int id = personBean.getId();
 
                 //在SharedPreferences中设置登录Cookie和当前登录人员id
                 if (!LoginInfoUtil.setLoginCookieAndId(getApplicationContext(), "我是loginCookie", id)) {

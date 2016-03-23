@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".main.pedometer.PedometerFragment">
+    tools:context=".pedometer.PedometerFragment">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -14,6 +14,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="?android:attr/actionBarSize"
+                android:background="@color/colorPrimaryDark"></LinearLayout>
 
             <android.support.v7.widget.CardView
                 android:id="@+id/cardView"
@@ -71,7 +76,7 @@
     </ScrollView>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fabCardView"
+        android:id="@+id/fab_round_progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@mipmap/ic_keyboard_arrow_down_white_18dp"

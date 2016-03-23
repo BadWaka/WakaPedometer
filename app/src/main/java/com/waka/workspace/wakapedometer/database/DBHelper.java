@@ -28,7 +28,8 @@ public class DBHelper extends SQLiteOpenHelper {
             + Constant.PERSON_COLUMN_HEIGHT + " real, "
             + Constant.PERSON_COLUMN_WEIGHT + " real, "
             + Constant.PERSON_COLUMN_ACCOUNT + " text unique, "       //account账户不可重复
-            + Constant.PERSON_COLUMN_PASSWORD + " text)";
+            + Constant.PERSON_COLUMN_PASSWORD + " text, "
+            + Constant.PERSON_COLUMN_HEADICON_URL + " text)";
 
     //创建步数信息表
     private static final String CREATE_TABLE_STEP_INFO = "create table " + Constant.TABLE_STEP_INFO + " ("

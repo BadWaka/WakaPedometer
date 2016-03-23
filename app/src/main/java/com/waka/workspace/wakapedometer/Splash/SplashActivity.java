@@ -9,11 +9,11 @@ import android.widget.TextView;
 
 import com.waka.workspace.wakapedometer.Constant;
 import com.waka.workspace.wakapedometer.R;
-import com.waka.workspace.wakapedometer.utils.LoginInfoUtil;
-import com.waka.workspace.wakapedometer.database.DBHelper;
 import com.waka.workspace.wakapedometer.login.SignInActivity;
 import com.waka.workspace.wakapedometer.login.SignUpActivity;
-import com.waka.workspace.wakapedometer.main.MainActivity;
+import com.waka.workspace.wakapedometer.MainActivity;
+import com.waka.workspace.wakapedometer.utils.LoginInfoUtil;
+import com.waka.workspace.wakapedometer.database.DBHelper;
 
 /**
  * 水花界面！等待预加载Activity

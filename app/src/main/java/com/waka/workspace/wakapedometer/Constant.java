@@ -44,6 +44,7 @@ public class Constant {
     public static final String PERSON_COLUMN_WEIGHT = "_weight";
     public static final String PERSON_COLUMN_ACCOUNT = "_account";
     public static final String PERSON_COLUMN_PASSWORD = "_password";
+    public static final String PERSON_COLUMN_HEADICON_URL = "_headicon_url";
 
     /*  StepInfo Table 步数信息表    */
     //表名
