@@ -15,7 +15,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnticipateOvershootInterpolator;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
@@ -42,23 +41,22 @@ public class PedometerFragment extends Fragment implements View.OnClickListener,
 
     private static final String TAG = "PedometerFragment";
 
-    //计步CardView
-    private CardView cardView;
-    private LinearLayout layoutProgressBar;
-    private int layoutHeightOriginal;//布局原来的高度
-    private RoundProgressBar roundProgressBar;//自定义圆形进度条
-    private EditText etMaxStep;//设置最大步数栏，默认隐藏
-    private FloatingActionButton fabCardView;//FAB
-    private static final int FAB_UP = 1;//FAB指向上
-    private static final int FAB_DOWN = 2;//FAB指向下
-
-    private Button btnAdd;
-
     //数据库操作类
     private int mId;//当前用户id
     private DBHelper mDBHelper;
     private SQLiteDatabase mDB;
     private StepInfoDBHelper mStepInfoDBHelper;
+
+    //圆形进度条栏，用来显示步数
+    private CardView cardViewProgressBar;//最外层cardView
+    private LinearLayout layoutProgressBar;//线性布局
+    private RoundProgressBar roundProgressBar;//自定义圆形进度条
+    private EditText etMaxStep;//设置最大步数编辑框，默认隐藏
+    private FloatingActionButton fabIsShowEtMaxStep;//是否显示最大步数编辑框的FAB
+    private int layoutHeightOriginal;//布局原来的高度
+    private static final int LAYOUT_HEIGHT_OFFSET = 400;//布局高度偏移量
+    private static final int FAB_UP = 1;//FAB指向上
+    private static final int FAB_DOWN = 2;//FAB指向下
 
     /**
      * 构造方法
@@ -118,19 +116,13 @@ public class PedometerFragment extends Fragment implements View.OnClickListener,
      */
     private void initView(View view) {
 
-        cardView = (CardView) view.findViewById(R.id.cardView);
-
+        //圆形进度条栏，用来显示步数
+        cardViewProgressBar = (CardView) view.findViewById(R.id.cardview_progressbar);
         layoutProgressBar = (LinearLayout) view.findViewById(R.id.layoutProgressBar);
-        layoutHeightOriginal = layoutProgressBar.getHeight();//获得布局原来的高度
-
         roundProgressBar = (RoundProgressBar) view.findViewById(R.id.roundProgressBar);
-
         etMaxStep = (EditText) view.findViewById(R.id.etMaxStep);
+        fabIsShowEtMaxStep = (FloatingActionButton) view.findViewById(R.id.fab_is_show_et_maxstep);
 
-        fabCardView = (FloatingActionButton) view.findViewById(R.id.fab_round_progress_bar);
-        fabCardView.setTag(FAB_DOWN);//设置向下标志，用来判断该指上还是指下
-
-        btnAdd = (Button) view.findViewById(R.id.btnAdd);
     }
 
     /**
@@ -143,24 +135,21 @@ public class PedometerFragment extends Fragment implements View.OnClickListener,
         mDBHelper = new DBHelper(PedometerFragment.this.getActivity(), Constant.DB, null, 1);
         mDB = mDBHelper.getWritableDatabase();
         mStepInfoDBHelper = new StepInfoDBHelper(mDB);
+
+        //获得布局原来的高度
+        layoutHeightOriginal = layoutProgressBar.getHeight();
+
+        //设置向下标志，用来判断该指上还是指下
+        fabIsShowEtMaxStep.setTag(FAB_DOWN);
     }
 
     /**
      * initEvent
      */
     private void initEvent() {
-        btnAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-                ObjectAnimator animator = ObjectAnimator.ofInt(roundProgressBar, "progress", roundProgressBar.getProgress(), roundProgressBar.getProgress() + 500);
-                animator.setDuration(500);
-                animator.start();
-
-            }
-        });
-
-        fabCardView.setOnClickListener(this);
+        //FAB点击事件
+        fabIsShowEtMaxStep.setOnClickListener(this);
     }
 
     /**
@@ -173,61 +162,70 @@ public class PedometerFragment extends Fragment implements View.OnClickListener,
 
         switch (v.getId()) {
 
-            case R.id.fab_round_progress_bar:
+            //如果是进度条栏的FAB
+            case R.id.fab_is_show_et_maxstep:
 
-                if ((int) fabCardView.getTag() == FAB_DOWN) {
+                //如果FAB箭头向下
+                if ((int) fabIsShowEtMaxStep.getTag() == FAB_DOWN) {
 
                     //高度变化动画
-                    ObjectAnimator heightAnimator = ObjectAnimator.ofInt(layoutProgressBar, "minimumHeight", layoutHeightOriginal, DensityUtil.dip2px(PedometerFragment.this.getActivity(), 440));
+                    ObjectAnimator heightAnimator = ObjectAnimator.ofInt(layoutProgressBar, "minimumHeight", layoutHeightOriginal, DensityUtil.dip2px(PedometerFragment.this.getActivity(), LAYOUT_HEIGHT_OFFSET));
                     //FAB旋转动画
-                    ObjectAnimator rotateAnimator = ObjectAnimator.ofFloat(fabCardView, "rotation", 0f, 180f);
+                    ObjectAnimator rotateAnimator = ObjectAnimator.ofFloat(fabIsShowEtMaxStep, "rotation", 0f, 180f);
                     //组合动画
                     AnimatorSet animatorSet = new AnimatorSet();
                     animatorSet.play(rotateAnimator).with(heightAnimator);
-                    animatorSet.setDuration(800);
-//                    animatorSet.setInterpolator(new AnticipateOvershootInterpolator());
+                    animatorSet.setDuration(500);
                     animatorSet.start();
                     animatorSet.addListener(new AnimatorListenerAdapter() {
                         @Override
-                        public void onAnimationEnd(Animator animation) {
+                        public void onAnimationEnd(Animator animation) {//动画结束时回调
                             super.onAnimationEnd(animation);
                             etMaxStep.setVisibility(View.VISIBLE);
                             etMaxStep.setText("" + roundProgressBar.getMax());
+                            etMaxStep.setSelection(etMaxStep.length());
                         }
                     });
 
-                    fabCardView.setTag(FAB_UP);
+                    fabIsShowEtMaxStep.setTag(FAB_UP);
 
-                } else {
+                }
+
+                //如果FAB箭头向上
+                else {
 
                     //如果etMaxStep不为空
-                    if (!etMaxStep.getText().toString().isEmpty()) {
+                    if (etMaxStep.getText().toString().isEmpty()) {
 
-                        //如果输入的最大步数大于步数
-                        if (Integer.valueOf(etMaxStep.getText().toString()) > roundProgressBar.getProgress()) {
-
-                            //设置最大步数
-                            roundProgressBar.setMax(Integer.valueOf(etMaxStep.getText().toString()));
-                        } else {
-
-                            etMaxStep.setError("最大步数小于当前步数！");
-                            return;
-                        }
+                        etMaxStep.setError("不能输入空！");
+                        return;
                     }
+
+                    //如果输入的最大步数大于步数
+                    if (Integer.valueOf(etMaxStep.getText().toString()) < roundProgressBar.getProgress()) {
+
+                        etMaxStep.setError("最大步数小于当前步数！");
+                        return;
+                    }
+
+                    int maxNew = Integer.valueOf(etMaxStep.getText().toString());
+                    Log.i(TAG, "maxNew=" + maxNew);
+
                     etMaxStep.setVisibility(View.GONE);
 
+                    //最大步数改变动画
+                    ObjectAnimator maxChangeAnimator = ObjectAnimator.ofInt(roundProgressBar, "max", roundProgressBar.getMax(), maxNew);
                     //高度变化动画
-                    ObjectAnimator heightAnimator = ObjectAnimator.ofInt(layoutProgressBar, "minimumHeight", DensityUtil.dip2px(PedometerFragment.this.getActivity(), 440), layoutHeightOriginal);
+                    ObjectAnimator heightAnimator = ObjectAnimator.ofInt(layoutProgressBar, "minimumHeight", DensityUtil.dip2px(PedometerFragment.this.getActivity(), LAYOUT_HEIGHT_OFFSET), layoutHeightOriginal);
                     //FAB旋转动画
-                    ObjectAnimator rotateAnimator = ObjectAnimator.ofFloat(fabCardView, "rotation", 180f, 360f);
+                    ObjectAnimator rotateAnimator = ObjectAnimator.ofFloat(fabIsShowEtMaxStep, "rotation", 180f, 360f);
                     //组合动画
                     AnimatorSet animatorSet = new AnimatorSet();
-                    animatorSet.play(rotateAnimator).with(heightAnimator);
-                    animatorSet.setDuration(1000);
-                    animatorSet.setInterpolator(new AnticipateOvershootInterpolator());
+                    animatorSet.play(rotateAnimator).with(heightAnimator).with(maxChangeAnimator);
+                    animatorSet.setDuration(500);
                     animatorSet.start();
 
-                    fabCardView.setTag(FAB_DOWN);
+                    fabIsShowEtMaxStep.setTag(FAB_DOWN);
 
                 }
 

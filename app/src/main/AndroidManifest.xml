@@ -15,7 +15,14 @@
         <!-- 水花界面，预览界面 -->
         <activity
             android:name=".splash.SplashActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"></activity>
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            、
+        </activity>
 
         <!-- 登录界面 -->
         <activity
@@ -37,21 +44,11 @@
         <!-- 个人信息界面 -->
         <activity
             android:name=".MineActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
 
         <!-- 后台计步服务 -->
         <service android:name=".pedometer.PedometerService" />
 
-        <activity
-            android:name=".ScrollingActivity"
-            android:label="@string/title_activity_scrolling"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

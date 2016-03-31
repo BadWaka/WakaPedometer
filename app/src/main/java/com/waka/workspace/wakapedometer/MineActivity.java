@@ -1,9 +1,11 @@
 package com.waka.workspace.wakapedometer;
 
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,14 +15,21 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 import com.waka.workspace.wakapedometer.customview.RulerView;
 import com.waka.workspace.wakapedometer.database.DBHelper;
 import com.waka.workspace.wakapedometer.database.PersonDBHelper;
+import com.waka.workspace.wakapedometer.database.bean.PersonBean;
+import com.waka.workspace.wakapedometer.utils.LoginInfoUtil;
+
+import java.lang.ref.WeakReference;
 
 /**
  * 个人中心
  */
 public class MineActivity extends AppCompatActivity implements View.OnClickListener {
+
+    private static final String TAG = "MineActivity";
 
     //数据库
     private int mId;
@@ -60,9 +69,12 @@ public class MineActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mine);
+
         initView();
         initData();
         initEvent();
+
+        new LoadInfoAsyckTask(this).execute();
     }
 
     /**
@@ -81,7 +93,6 @@ public class MineActivity extends AppCompatActivity implements View.OnClickListe
 
         //昵称栏
         etNickname = (EditText) findViewById(R.id.et_nickname);
-        etNickname.setSelection(etNickname.getText().length());
 
         //性别栏
         radioGroup = (RadioGroup) findViewById(R.id.radio_group);
@@ -103,16 +114,13 @@ public class MineActivity extends AppCompatActivity implements View.OnClickListe
     private void initData() {
 
         //初始化数据库
-//        mId = LoginInfoUtil.getCurrentLoginId(MineActivity.this);
-//        mDBHelper = new DBHelper(MineActivity.this, Constant.DB, null, 1);
-//        mDB = mDBHelper.getWritableDatabase();
-//        mPersonDBHelper = new PersonDBHelper(mDB);
+        mId = LoginInfoUtil.getCurrentLoginId(MineActivity.this);
+        mDBHelper = new DBHelper(MineActivity.this, Constant.DB, null, 1);
+        mDB = mDBHelper.getWritableDatabase();
+        mPersonDBHelper = new PersonDBHelper(mDB);
 
         //设置toolbar
         this.setSupportActionBar(toolbar);
-
-        //设置性别栏
-        rdbtnMale.setChecked(true);//默认为男
 
         //设置身高RulerView
         rulerViewHeight.setStartValue(50);
@@ -191,6 +199,84 @@ public class MineActivity extends AppCompatActivity implements View.OnClickListe
             default:
 
                 break;
+        }
+    }
+
+    /**
+     * 读取信息AsyckTask
+     * <p/>
+     * 使用静态内部类和弱引用减少内存泄漏
+     */
+    private static class LoadInfoAsyckTask extends AsyncTask<Void, Void, PersonBean> {
+
+        //弱引用MineActivity实例
+        private WeakReference<MineActivity> wrMineActivity;
+
+        /**
+         * 构造方法，须传入MineActivity实例
+         *
+         * @param mineActivity
+         */
+        public LoadInfoAsyckTask(MineActivity mineActivity) {
+            wrMineActivity = new WeakReference<MineActivity>(mineActivity);
+        }
+
+        @Override
+        /**
+         * onPreExecute
+         */
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        /**
+         * 后台读取数据库
+         */
+        protected PersonBean doInBackground(Void... params) {
+
+            PersonBean personBean = wrMineActivity.get().mPersonDBHelper.queryById(wrMineActivity.get().mId);
+
+            return personBean;
+        }
+
+        @Override
+        /**
+         * 前台更新UI
+         */
+        protected void onPostExecute(PersonBean personBean) {
+            super.onPostExecute(personBean);
+
+            if (personBean == null) {
+                return;
+            }
+            Log.i(TAG, personBean.toString());
+
+            //设置昵称
+            wrMineActivity.get().etNickname.setText(personBean.getNickName());
+            wrMineActivity.get().etNickname.setSelection(wrMineActivity.get().etNickname.getText().length());//设置光标位置
+
+            //设置性别
+            switch (personBean.getSex()) {
+                case 0:
+                    wrMineActivity.get().radioGroup.check(R.id.radio_btn_male);
+                    break;
+                case 1:
+                    wrMineActivity.get().radioGroup.check(R.id.radio_btn_female);
+                    break;
+            }
+
+            //设置身高
+            if (personBean.getHeight() != 0) {
+                wrMineActivity.get().tvHeight.setText("" + personBean.getHeight());
+                wrMineActivity.get().rulerViewHeight.setOriginValue((int) personBean.getHeight());
+            }
+
+            //设置体重
+            if (personBean.getWeight() != 0) {
+                wrMineActivity.get().tvWeight.setText("" + personBean.getWeight());
+                wrMineActivity.get().rulerViewWeight.setOriginValue((int) personBean.getWeight());
+            }
         }
     }
 }

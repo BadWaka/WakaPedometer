@@ -127,8 +127,6 @@ public class PersonDBHelper {
      */
     public PersonBean queryById(int id) {
 
-        PersonBean personBean = new PersonBean();
-
         // SQL语句： select * from _person where _account = '1456683844@qq.com'
         Cursor cursor = mDB.rawQuery("select * from " + Constant.TABLE_PERSON
                 + " where " + Constant.PERSON_COLUMN_ID + " = ?", new String[]{"" + id});
@@ -151,6 +149,7 @@ public class PersonDBHelper {
 
         cursor.close();
 
+        PersonBean personBean = new PersonBean();
         personBean.setId(idDB);
         personBean.setName(nameDB);
         personBean.setNickName(nicknameDB);

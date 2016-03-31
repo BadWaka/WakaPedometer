@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!--日历-->
+    <item
+        android:id="@+id/action_calendar"
+        android:icon="@mipmap/ic_date_range_white_24dp"
+        android:title="日历"
+        app:showAsAction="always" />
+
+    <!--分享-->
+    <item
+        android:id="@+id/action_share"
+        android:icon="@mipmap/ic_share_white_24dp"
+        android:title="分享"
+        app:showAsAction="always" />
+
+</menu>

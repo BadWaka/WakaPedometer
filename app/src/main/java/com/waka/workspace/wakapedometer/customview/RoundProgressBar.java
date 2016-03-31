@@ -108,10 +108,12 @@ public class RoundProgressBar extends View {
     public synchronized void setMax(int max) {
 
         if (max < 0) {
-            throw new IllegalArgumentException("max not less than 0");
+//            throw new IllegalArgumentException("max not less than 0");
+            max = 0;
         }
 
         this.max = max;
+        postInvalidate();
     }
 
     public synchronized int getProgress() {

@@ -34,6 +34,8 @@
     <string name="tab_text_discovery_main_activity">发现</string>
     <string name="prompt_double_exit_tips_main_activity">再按一次退出程序</string>
     <!--侧滑菜单 DrawerMenu-->
+    <string name="actionbar_drawer_toggle_open_main_activity">Open</string>
+    <string name="actionbar_drawer_toggle_close_main_activity">Close</string>
     <string name="nav_title_service_switch_main_activity">后台开关</string>
     <string name="nav_start_service_main_activity">开始计步服务</string>
     <string name="nav_stop_service_main_activity">停止计步服务</string>
@@ -152,5 +154,6 @@
         "when a user tries to pick up one of cards.\n\n"
     </string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_blank">BlankActivity</string>
 
 </resources>

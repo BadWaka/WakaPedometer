@@ -50,6 +50,7 @@
                     android:layout_weight="1"
                     android:gravity="center_vertical"
                     android:text="@string/title_activity_mine"
+                    android:textColor="@android:color/white"
                     android:textSize="18sp" />
 
                 <LinearLayout
@@ -82,8 +83,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            android:paddingRight="@dimen/activity_horizontal_margin">
 
             <!--修改头像栏-->
             <LinearLayout

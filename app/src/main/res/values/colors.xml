@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#212121</color>
-    <color name="colorPrimaryDark">#000000</color>
+    <!--基础色-->
+    <color name="colorPrimary">#e91e63</color>
+    <!--基础色（深）-->
+    <color name="colorPrimaryDark">#ad1457</color>
+    <!--强调色-->
     <color name="colorAccent">#f50057</color>
-
-    <color name="black_overlay">#66000000</color>
+    <!--CardView 分割线-->
+    <color name="colorCardViewDivider">#E3E3E3</color>
 </resources>

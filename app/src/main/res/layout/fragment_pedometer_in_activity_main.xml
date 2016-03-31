@@ -15,75 +15,367 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="?android:attr/actionBarSize"
-                android:background="@color/colorPrimaryDark"></LinearLayout>
-
+            <!--步数-->
             <android.support.v7.widget.CardView
-                android:id="@+id/cardView"
+                android:id="@+id/cardview_progressbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/activity_horizontal_margin"
-                app:cardCornerRadius="5dp">
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                app:cardCornerRadius="@dimen/card_view_corner_radius">
 
                 <LinearLayout
-                    android:id="@+id/layoutProgressBar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical"
-                    android:padding="@dimen/activity_double_margin">
+                    android:orientation="vertical">
 
-                    <com.waka.workspace.wakapedometer.customview.RoundProgressBar
-                        android:id="@+id/roundProgressBar"
-                        android:layout_width="240dp"
-                        android:layout_height="240dp"
-                        app:max="10000"
-                        app:roundColor="@color/colorPrimary"
-                        app:roundProgressColor="#00B2EE"
-                        app:roundWidth="25dp"
-                        app:textColor="@color/colorAccent"
-                        app:textSize="36sp" />
-
-                    <!--输入最大步数-->
-                    <android.support.design.widget.TextInputLayout
+                    <!--圆形进度条和最大步数-->
+                    <LinearLayout
+                        android:id="@+id/layoutProgressBar"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/activity_double_margin"
-                        android:theme="@style/AppTheme">
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
 
-                        <EditText
-                            android:id="@+id/etMaxStep"
+                        <!--圆形进度条-->
+                        <com.waka.workspace.wakapedometer.customview.RoundProgressBar
+                            android:id="@+id/roundProgressBar"
+                            android:layout_width="240dp"
+                            android:layout_height="240dp"
+                            android:layout_marginTop="@dimen/activity_vertical_margin"
+                            app:max="10000"
+                            app:roundColor="@color/colorPrimary"
+                            app:roundProgressColor="#00B2EE"
+                            app:roundWidth="25dp"
+                            app:textColor="@color/colorAccent"
+                            app:textSize="36sp" />
+
+                        <!--输入最大步数-->
+                        <android.support.design.widget.TextInputLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="@string/prompt_input_max_step_pedometer_fragment"
-                            android:numeric="integer"
+                            android:layout_marginLeft="@dimen/activity_double_margin"
+                            android:layout_marginRight="@dimen/activity_double_margin"
+                            android:layout_marginTop="@dimen/activity_double_margin"
+                            android:theme="@style/AppTheme">
+
+                            <EditText
+                                android:id="@+id/etMaxStep"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="@string/prompt_input_max_step_pedometer_fragment"
+                                android:numeric="integer"
+                                android:singleLine="true"
+                                android:visibility="gone" />
+                        </android.support.design.widget.TextInputLayout>
+
+                    </LinearLayout>
+
+                    <!--分割线-->
+                    <LinearLayout
+                        android:id="@+id/layout_divider"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginBottom="@dimen/activity_double_margin"
+                        android:background="@color/colorCardViewDivider"
+                        android:orientation="horizontal" />
+
+                    <!--额外步数信息-->
+                    <LinearLayout
+                        android:id="@+id/layout_extra_step_info"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:padding="@dimen/activity_horizontal_margin">
+
+                        <!--绕XX多少多少圈-->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="@dimen/icon_small"
+                                android:layout_height="@dimen/icon_small"
+                                android:src="@mipmap/ic_assistant_photo_white_24dp"
+                                android:tint="@color/colorAccent" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text=" ≈ 绕故宫" />
+
+                            <!--圈数-->
+                            <TextView
+                                android:id="@+id/tv_circle_counter"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:singleLine="true"
+                                android:text="0.0" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="圈" />
+
+                        </LinearLayout>
+
+                        <!--距离、热量、活跃时间-->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/activity_vertical_margin"
+                            android:gravity="center"
+                            android:orientation="horizontal">
+
+                            <!--距离-->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/tv_distance"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:singleLine="true"
+                                    android:text="0.0"
+                                    android:textSize="32sp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="距离:公里"
+                                    android:textColor="#cccccc" />
+
+                            </LinearLayout>
+
+                            <!--热量-->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/tv_calories"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:singleLine="true"
+                                    android:text="0"
+                                    android:textSize="32sp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="热量:千卡"
+                                    android:textColor="#cccccc" />
+
+                            </LinearLayout>
+
+                            <!--活跃时间-->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/tv_active_time"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:singleLine="true"
+                                    android:text="0"
+                                    android:textSize="32sp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="活跃:分钟"
+                                    android:textColor="#cccccc" />
+
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+            </android.support.v7.widget.CardView>
+
+            <!--天气信息-->
+            <android.support.v7.widget.CardView
+                android:id="@+id/cardview_weather"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:clickable="true"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardCornerRadius="@dimen/card_view_corner_radius">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="@dimen/activity_horizontal_margin">
+
+                    <ImageView
+                        android:id="@+id/img_weather"
+                        android:layout_width="@dimen/icon_small"
+                        android:layout_height="@dimen/icon_small"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerVertical="true"
+                        android:src="@mipmap/ic_wb_sunny_white_24dp"
+                        android:tint="@color/colorPrimary" />
+
+                    <!--温度栏-->
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="@dimen/activity_horizontal_margin">
+
+                        <!--最小温度-->
+                        <TextView
+                            android:id="@+id/tv_min_temperature"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
                             android:singleLine="true"
-                            android:visibility="gone" />
-                    </android.support.design.widget.TextInputLayout>
+                            android:text="0" />
+
+                        <!--横杠-->
+                        <TextView
+                            android:id="@+id/tv_whippletree"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_toRightOf="@+id/tv_min_temperature"
+                            android:text="-" />
+
+                        <!--最大温度-->
+                        <TextView
+                            android:id="@+id/tv_max_temperature"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_toRightOf="@+id/tv_whippletree"
+                            android:singleLine="true"
+                            android:text="23" />
+
+                        <!--摄氏度-->
+                        <TextView
+                            android:id="@+id/tv_degree_centigrade"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginRight="@dimen/activity_horizontal_margin"
+                            android:layout_toRightOf="@+id/tv_max_temperature"
+                            android:text="℃" />
+
+                    </RelativeLayout>
+
+                    <!--空气质量栏-->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tv_air_quality_tips"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:text="空气质量" />
+
+                        <!--空气质量-->
+                        <TextView
+                            android:id="@+id/tv_air_quality"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:singleLine="true"
+                            android:text="288" />
+
+                        <!--污染程度-->
+                        <TextView
+                            android:id="@+id/tv_pollution_level"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:singleLine="true"
+                            android:text="重度污染"
+                            android:textColor="@color/colorAccent" />
+                    </LinearLayout>
 
                 </LinearLayout>
 
             </android.support.v7.widget.CardView>
 
-            <Button
-                android:id="@+id/btnAdd"
-                android:layout_width="wrap_content"
+            <!--地理位置-->
+            <android.support.v7.widget.CardView
+                android:id="@+id/cardview_location"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Add" />
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:clickable="true"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardCornerRadius="@dimen/card_view_corner_radius">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="@dimen/activity_horizontal_margin">
+
+                    <ImageView
+                        android:id="@+id/img_location"
+                        android:layout_width="@dimen/icon_small"
+                        android:layout_height="@dimen/icon_small"
+                        android:src="@mipmap/ic_place_white_24dp"
+                        android:tint="@color/colorPrimary" />
+
+                    <!--当前位置-->
+                    <TextView
+                        android:id="@+id/tv_location"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                        android:singleLine="true"
+                        android:text="北京盛捷中关村服务公寓附近"
+                        android:textColor="@android:color/black" />
+
+                </LinearLayout>
+
+            </android.support.v7.widget.CardView>
+
         </LinearLayout>
     </ScrollView>
 
+    <!--是否显示最大步数编辑框的FAB
+        依附于cardview_progressbar-->
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_round_progress_bar"
+        android:id="@+id/fab_is_show_et_maxstep"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@mipmap/ic_keyboard_arrow_down_white_18dp"
         android:tint="@color/colorAccent"
         app:backgroundTint="@android:color/white"
         app:fabSize="mini"
-        app:layout_anchor="@id/cardView"
+        app:layout_anchor="@id/layout_divider"
         app:layout_anchorGravity="bottom|center" />
 
 </android.support.design.widget.CoordinatorLayout>

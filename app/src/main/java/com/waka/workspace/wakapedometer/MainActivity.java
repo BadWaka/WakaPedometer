@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.support.design.widget.NavigationView;
@@ -13,10 +14,13 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AnticipateOvershootInterpolator;
@@ -38,7 +42,7 @@ import java.util.ArrayList;
 /**
  * 主界面
  */
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, ViewPager.OnPageChangeListener, NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = "MainActivity";
 
@@ -51,6 +55,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int mId;
     private PersonBean mPersonBean;
 
+    //Toolbar
+    private Toolbar toolbar;
+    private ActionBarDrawerToggle actionBarDrawerToggle;//工具栏上的侧边栏开关，左上角带感的导航动画
+
     //侧滑菜单
     private DrawerLayout drawerLayout;//抽屉布局
     private NavigationView navigationView;//导航栏
@@ -58,20 +66,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView imgHeadIcon;//头像
     private TextView tvNickName;//昵称
     private ImageView imgLogout;//登出图标
-
-    //viewPager和Fragment
-    private ViewPager viewPager;
-    private ArrayList<Fragment> fragmentArrayList;
-    private MyFragmentPagerAdapter fragmentPagerAdapter;
-    private PedometerFragment pedometerFragment;
-    private HistoryFragment historyFragment;
-    private DiscoveryFragment discoveryFragment;
-
-    //底部按钮栏
-    private LinearLayout layoutBottomTab;
-    private LinearLayout layoutPedometer, layoutHistory, layoutDiscovery;
-    private ImageView imgPedometer, imgHistory, imgDiscovery;
-    private TextView tvPedometer, tvHistory, tvDiscovery;
 
     //双击退出
     private long mExitTime = 0;//退出时间，用来实现双击退出功能
@@ -85,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         initView();
         initData();
         initEvent();
@@ -93,30 +88,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     /*initView*/
     private void initView() {
 
+        //Toolbar
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+
         //侧滑菜单
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.actionbar_drawer_toggle_open_main_activity, R.string.actionbar_drawer_toggle_close_main_activity);
         navigationView = (NavigationView) findViewById(R.id.navigationView);
         headerView = navigationView.getHeaderView(0);
         imgHeadIcon = (ImageView) headerView.findViewById(R.id.img_headicon);
         tvNickName = (TextView) headerView.findViewById(R.id.tvNickName);
         imgLogout = (ImageView) headerView.findViewById(R.id.imgLogout);
 
-        //viewPager和Fragment
-        viewPager = (ViewPager) findViewById(R.id.viewPager);
-
-        //底部按钮栏
-        layoutBottomTab = (LinearLayout) findViewById(R.id.layoutBottomTab);
-        layoutPedometer = (LinearLayout) findViewById(R.id.layoutPedometer);
-        layoutHistory = (LinearLayout) findViewById(R.id.layoutHistory);
-        layoutDiscovery = (LinearLayout) findViewById(R.id.layoutDiscovery);
-
-        imgPedometer = (ImageView) findViewById(R.id.imgPedometer);
-        imgHistory = (ImageView) findViewById(R.id.imgHistory);
-        imgDiscovery = (ImageView) findViewById(R.id.imgDiscovery);
-
-        tvPedometer = (TextView) findViewById(R.id.tvPedometer);
-        tvHistory = (TextView) findViewById(R.id.tvHistory);
-        tvDiscovery = (TextView) findViewById(R.id.tvDiscovery);
     }
 
     /*initData*/
@@ -135,28 +118,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Intent intentStart = new Intent(MainActivity.this, PedometerService.class);
         startService(intentStart);
 
-        //侧边栏
-        tvNickName.setText(mPersonBean.getNickName());
+        //Toolbar
+        toolbar.setTitle("");
+        this.setSupportActionBar(toolbar);
 
-        //viewPager和fragment
-        pedometerFragment = PedometerFragment.newInstance(null);
-        historyFragment = HistoryFragment.newInstance(null);
-        discoveryFragment = DiscoveryFragment.newInstance(null);
-        fragmentArrayList = new ArrayList<>();
-        fragmentArrayList.add(pedometerFragment);
-        fragmentArrayList.add(historyFragment);
-        fragmentArrayList.add(discoveryFragment);
-        fragmentPagerAdapter = new MyFragmentPagerAdapter(getSupportFragmentManager(), fragmentArrayList);
-        viewPager.setAdapter(fragmentPagerAdapter);
-        viewPager.setCurrentItem(0);
-        tvPedometer.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.colorAccent));
-        imgPedometer.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.colorAccent));
+        //侧滑菜单
+        tvNickName.setText(mPersonBean.getNickName());
+        navigationView.setItemIconTintList(null);//设置菜单图标回复本来的颜色
+
     }
 
     /*initEvent*/
     private void initEvent() {
 
-        //侧滑菜单头像和昵称监听
+        //侧滑菜单
+        drawerLayout.setDrawerListener(actionBarDrawerToggle);//导航按钮监听
         imgHeadIcon.setOnClickListener(this);
         tvNickName.setOnClickListener(this);
 
@@ -166,13 +142,45 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //注册导航栏选择监听事件
         navigationView.setNavigationItemSelectedListener(this);
 
-        //设置翻页监听
-        viewPager.addOnPageChangeListener(this);
+    }
 
-        //底部按钮栏点击事件
-        layoutPedometer.setOnClickListener(this);
-        layoutHistory.setOnClickListener(this);
-        layoutDiscovery.setOnClickListener(this);
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_menu_in_activity, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        actionBarDrawerToggle.syncState();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (actionBarDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+
+        switch (item.getItemId()) {
+
+            case R.id.action_calendar:
+                break;
+
+            case R.id.action_share:
+                break;
+
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        actionBarDrawerToggle.onConfigurationChanged(newConfig);
     }
 
     /**
@@ -192,7 +200,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     //关闭侧边栏
                     drawerLayout.closeDrawer(GravityCompat.START);
                 }
-
                 Intent intentMine1 = new Intent(MainActivity.this, MineActivity.class);
                 startActivityForResult(intentMine1, Constant.REQUEST_CODE_MINE_ACTIVITY);
 
@@ -206,7 +213,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     //关闭侧边栏
                     drawerLayout.closeDrawer(GravityCompat.START);
                 }
-
                 Intent intentMine2 = new Intent(MainActivity.this, MineActivity.class);
                 startActivityForResult(intentMine2, Constant.REQUEST_CODE_MINE_ACTIVITY);
 
@@ -242,99 +248,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 break;
 
-            case R.id.layoutPedometer:
-                viewPager.setCurrentItem(0);
-                break;
-
-            case R.id.layoutHistory:
-                viewPager.setCurrentItem(1);
-                break;
-
-            case R.id.layoutDiscovery:
-                viewPager.setCurrentItem(2);
-                break;
-
-            default:
-                break;
-        }
-    }
-
-    /**
-     * 翻页监听
-     *
-     * @param position
-     * @param positionOffset
-     * @param positionOffsetPixels
-     */
-    @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-    }
-
-    /*翻页监听*/
-    @Override
-    public void onPageSelected(int position) {
-        setTabColor(position);
-    }
-
-    /*翻页监听*/
-    @Override
-    public void onPageScrollStateChanged(int state) {
-
-    }
-
-    /**
-     * 设置底部标签的颜色和动画
-     *
-     * @param tabPosition
-     */
-    private void setTabColor(int tabPosition) {
-        Animator animator = AnimatorInflater.loadAnimator(MainActivity.this, R.animator.anim_rotation_circle);
-        switch (tabPosition) {
-            case 0:
-
-                //设置旋转动画
-                animator.setTarget(imgPedometer);
-                animator.setInterpolator(new AnticipateOvershootInterpolator());
-                animator.start();
-                //设置文字颜色
-                tvPedometer.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.colorAccent));
-                tvHistory.setTextColor(Color.WHITE);
-                tvDiscovery.setTextColor(Color.WHITE);
-                //设置图片颜色
-                imgPedometer.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.colorAccent));
-                imgHistory.setColorFilter(Color.WHITE);
-                imgDiscovery.setColorFilter(Color.WHITE);
-                break;
-            case 1:
-
-                //设置旋转动画
-                animator.setTarget(imgHistory);
-                animator.setInterpolator(new AnticipateOvershootInterpolator());
-                animator.start();
-                //设置文字颜色
-                tvPedometer.setTextColor(Color.WHITE);
-                tvHistory.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.colorAccent));
-                tvDiscovery.setTextColor(Color.WHITE);
-                //设置图片颜色
-                imgPedometer.setColorFilter(Color.WHITE);
-                imgHistory.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.colorAccent));
-                imgDiscovery.setColorFilter(Color.WHITE);
-                break;
-            case 2:
-                //设置旋转动画
-                animator.setTarget(imgDiscovery);
-                animator.setInterpolator(new AnticipateOvershootInterpolator());
-                animator.start();
-                //设置文字颜色
-                tvPedometer.setTextColor(Color.WHITE);
-                tvHistory.setTextColor(Color.WHITE);
-                tvDiscovery.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.colorAccent));
-                //设置图片颜色
-                imgPedometer.setColorFilter(Color.WHITE);
-                imgHistory.setColorFilter(Color.WHITE);
-                imgDiscovery.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.colorAccent));
-                break;
             default:
                 break;
         }
@@ -374,7 +287,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 int maxMemory = DeviceInfoUtil.getMaxMemory();
 
-                Snackbar.make(layoutBottomTab, "maxMemory=" + maxMemory + "MB", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(toolbar, "maxMemory=" + maxMemory + "MB", Snackbar.LENGTH_SHORT).show();
 
                 break;
 
@@ -389,6 +302,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         return true;
+    }
+
+    @Override
+    /**
+     * onActivityResult
+     */
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+
+            //MineActivity
+            case Constant.REQUEST_CODE_MINE_ACTIVITY:
+
+                break;
+        }
     }
 
     /**
@@ -415,7 +344,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //如果时间间隔大于2秒
         if ((System.currentTimeMillis() - mExitTime) > 2000) {
-            Snackbar.make(viewPager, R.string.prompt_double_exit_tips_main_activity, Snackbar.LENGTH_SHORT).setAction("delete", new View.OnClickListener() {
+            Snackbar.make(toolbar, R.string.prompt_double_exit_tips_main_activity, Snackbar.LENGTH_SHORT).setAction("delete", new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
@@ -427,4 +356,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);//淡入淡出
         }
     }
+
 }
