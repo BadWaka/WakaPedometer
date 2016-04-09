@@ -14,7 +14,7 @@ import java.sql.Date;
  */
 public class StepInfoDBHelper {
 
-    private static final String TAG = "Pedometer StepInfoDBHelper";
+    private static final String TAG = "StepInfoDBHelper";
 
     private SQLiteDatabase mDB;
 

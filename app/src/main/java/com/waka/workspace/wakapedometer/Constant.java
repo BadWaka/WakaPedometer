@@ -18,12 +18,18 @@ public class Constant {
     public static final String STEP_CHANGE_BROADCAST = "com.waka.workspace.wakapedometer.STEP_CHANGE_BROADCAST";
 
     /**
+     * Activity之间传数据的字段
+     */
+    public static final String INTENT_FIELD_NAME_WEATHER_INFO_JSON = "weatherInfoJSON";//天气信息，JSON格式
+
+    /**
      * RequestCode
      */
     public static final int REQUEST_CODE_SIGN_IN_ACTIVITY = 10001;//登录界面，SignInActivity
     public static final int REQUEST_CODE_SIGN_UP_ACTIVITY = 10002;//注册界面，SignUpActivity
     public static final int REQUEST_CODE_MAIN_ACTIVITY = 10003;//主界面，MainActivity
     public static final int REQUEST_CODE_MINE_ACTIVITY = 10004;//个人中心界面，MineActivity
+    public static final int REQUEST_CODE_WEATHER_ACTIVITY = 10005;//天气界面，WeatherActivity
 
     /**
      * DataBase

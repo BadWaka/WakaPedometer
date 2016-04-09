@@ -15,7 +15,6 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 import com.waka.workspace.wakapedometer.customview.RulerView;
 import com.waka.workspace.wakapedometer.database.DBHelper;
 import com.waka.workspace.wakapedometer.database.PersonDBHelper;

@@ -4,20 +4,30 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnticipateOvershootInterpolator;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import com.alibaba.fastjson.JSON;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.Volley;
 import com.waka.workspace.wakapedometer.Constant;
 import com.waka.workspace.wakapedometer.R;
 import com.waka.workspace.wakapedometer.database.StepInfoDBHelper;
@@ -25,7 +35,15 @@ import com.waka.workspace.wakapedometer.utils.DensityUtil;
 import com.waka.workspace.wakapedometer.utils.LoginInfoUtil;
 import com.waka.workspace.wakapedometer.customview.RoundProgressBar;
 import com.waka.workspace.wakapedometer.database.DBHelper;
+import com.waka.workspace.wakapedometer.weather.GetWeatherInfoRequest;
+import com.waka.workspace.wakapedometer.weather.WeatherActivity;
+import com.waka.workspace.wakapedometer.weather.WeatherBean;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.lang.ref.WeakReference;
 import java.sql.Date;
 import java.util.Observable;
 import java.util.Observer;
@@ -47,6 +65,9 @@ public class PedometerFragment extends Fragment implements View.OnClickListener,
     private SQLiteDatabase mDB;
     private StepInfoDBHelper mStepInfoDBHelper;
 
+    //Volley网络变量
+    private RequestQueue mRequestQueue;//Volley请求队列
+
     //圆形进度条栏，用来显示步数
     private CardView cardViewProgressBar;//最外层cardView
     private LinearLayout layoutProgressBar;//线性布局
@@ -58,10 +79,82 @@ public class PedometerFragment extends Fragment implements View.OnClickListener,
     private static final int FAB_UP = 1;//FAB指向上
     private static final int FAB_DOWN = 2;//FAB指向下
 
+    //额外步数信息
+    private TextView tvCirclePlace;//绕XX多少多少圈的地名
+    private TextView tvCircleCounter;//绕XX多少多少圈的圈数
+    private TextView tvDistance;//距离
+    private TextView tvCalories;//热量
+    private TextView tvActiveTime;//活跃时间
+
+    //天气
+    private CardView cvWeather;//天气CardView
+    private ImageView imgWeather;//小图标
+    private TextView tvTemperature;//温度
+    private TextView tvAirQuality;//空气质量系数
+    private TextView tvPollutionLevel;//污染程度
+    private JSONObject weatherInfoJSON;//天气信息，JSON
+    private WeatherBean weatherBean;//天气信息，JavaBean
+
+    //地理位置
+    private ImageView imgLocation;//小图标
+    private TextView tvLocation;//污染程度
+
+    //Handler What
+    private static final int WHAT_WEATHER_INFO_FAIL = 0;//获取天气信息失败
+    private static final int WHAT_WEATHER_INFO_SUCCESS = 1;//获取天气信息成功
+
+    // Handler
+    private MyHandler mHandler = new MyHandler(this);
+
     /**
-     * 构造方法
+     * 静态Handler内部类，避免内存泄漏
+     *
+     * @author waka
      */
-    public PedometerFragment() {
+    private static class MyHandler extends Handler {
+
+        // 对Handler持有的对象使用弱引用
+        private WeakReference<PedometerFragment> wrPedometerFragment;
+
+        public MyHandler(PedometerFragment pedometerFragment) {
+            wrPedometerFragment = new WeakReference<PedometerFragment>(pedometerFragment);
+        }
+
+        public void handleMessage(Message msg) {
+
+            switch (msg.what) {
+
+                //获取天气信息失败
+                case WHAT_WEATHER_INFO_FAIL:
+
+                    VolleyError volleyError = (VolleyError) msg.obj;
+                    Snackbar.make(wrPedometerFragment.get().cvWeather, volleyError.getMessage(), Snackbar.LENGTH_SHORT).show();
+
+                    break;
+
+                //获取天气信息成功
+                case WHAT_WEATHER_INFO_SUCCESS:
+
+                    //获得weatherBean
+                    wrPedometerFragment.get().weatherBean = (WeatherBean) msg.obj;
+
+                    //获得详细数据
+                    WeatherBean weatherBean = wrPedometerFragment.get().weatherBean;
+                    String temperature = weatherBean.getNow().getTmp();//温度
+                    String aqi = weatherBean.getAqi().getCity().getAqi();//空气质量指数
+                    String quality = weatherBean.getAqi().getCity().getQlty();//空气质量类别
+
+                    //更新UI
+                    wrPedometerFragment.get().tvTemperature.setText(temperature);
+                    wrPedometerFragment.get().tvAirQuality.setText(aqi);
+                    wrPedometerFragment.get().tvPollutionLevel.setText(quality);
+
+                    break;
+
+                default:
+                    break;
+            }
+        }
 
     }
 
@@ -77,18 +170,27 @@ public class PedometerFragment extends Fragment implements View.OnClickListener,
         return fragment;
     }
 
+    @Override
     /**
      * onCreate
-     *
-     * @param savedInstanceState
      */
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //如果有数据的话，可以取出来
         if (getArguments() != null) {
 
         }
+    }
+
+    @Override
+    /**
+     * onDestroy
+     */
+    public void onDestroy() {
+        super.onDestroy();
+
+        //移除消息队列中所有消息
+        mHandler.removeCallbacksAndMessages(null);
     }
 
     /**
@@ -123,6 +225,23 @@ public class PedometerFragment extends Fragment implements View.OnClickListener,
         etMaxStep = (EditText) view.findViewById(R.id.etMaxStep);
         fabIsShowEtMaxStep = (FloatingActionButton) view.findViewById(R.id.fab_is_show_et_maxstep);
 
+        //额外步数信息
+        tvCirclePlace = (TextView) view.findViewById(R.id.tv_circle_place);//绕XX多少多少圈的地名
+        tvCircleCounter = (TextView) view.findViewById(R.id.tv_circle_counter);//绕XX多少多少圈的圈数
+        tvDistance = (TextView) view.findViewById(R.id.tv_distance);//距离
+        tvCalories = (TextView) view.findViewById(R.id.tv_calories);//热量
+        tvActiveTime = (TextView) view.findViewById(R.id.tv_active_time);//活跃时间
+
+        //天气
+        cvWeather = (CardView) view.findViewById(R.id.cardview_weather);//天气CardView
+        imgWeather = (ImageView) view.findViewById(R.id.img_weather);//小图标
+        tvTemperature = (TextView) view.findViewById(R.id.tv_temperature);//温度
+        tvAirQuality = (TextView) view.findViewById(R.id.tv_air_quality);//空气质量系数
+        tvPollutionLevel = (TextView) view.findViewById(R.id.tv_pollution_level);//污染程度
+
+        //地理位置
+        imgLocation = (ImageView) view.findViewById(R.id.img_location);//小图标
+        tvLocation = (TextView) view.findViewById(R.id.tv_location);//污染程度
     }
 
     /**
@@ -136,11 +255,70 @@ public class PedometerFragment extends Fragment implements View.OnClickListener,
         mDB = mDBHelper.getWritableDatabase();
         mStepInfoDBHelper = new StepInfoDBHelper(mDB);
 
-        //获得布局原来的高度
-        layoutHeightOriginal = layoutProgressBar.getHeight();
+        //初始化网络
+        mRequestQueue = Volley.newRequestQueue(getActivity());//初始化请求队列
 
-        //设置向下标志，用来判断该指上还是指下
-        fabIsShowEtMaxStep.setTag(FAB_DOWN);
+        //圆形进度条栏，用来显示步数
+        layoutHeightOriginal = layoutProgressBar.getHeight();//圆形进度条栏，用来显示步数
+        fabIsShowEtMaxStep.setTag(FAB_DOWN);//圆形进度条栏，用来显示步数
+
+        //获取天气数据
+        GetWeatherInfoRequest getWeatherInfoRequest = GetWeatherInfoRequest.newInstance("beijing",
+                new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(final JSONObject response) {
+
+                        Log.d(TAG, "【initData】【onResponse】response = " + response.toString());
+
+                        weatherInfoJSON = response;
+
+                        //新建线程用于反序列化
+                        new Thread() {
+                            @Override
+                            public void run() {
+
+                                try {
+
+                                    //从原始JSON中用 "HeWeather data service 3.0" 字段取出一个JSONArray
+                                    JSONArray jsonArray = null;
+                                    jsonArray = response.getJSONArray(WeatherBean.TOTAL_NAME);
+
+                                    //TODO
+                                    //一般来说，第一个就是我们要的可以反序列化的JSON数据了
+                                    JSONObject jsonWeather = (JSONObject) jsonArray.get(0);
+
+                                    //反序列化
+                                    WeatherBean weatherBean = JSON.parseObject(jsonWeather.toString(), WeatherBean.class);
+
+                                    //发送成功消息
+                                    Message msg = Message.obtain();
+                                    msg.what = WHAT_WEATHER_INFO_SUCCESS;
+                                    msg.obj = weatherBean;//把weatherBean放进去
+                                    mHandler.sendMessage(msg);
+
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }.start();
+
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                        Log.e(TAG, "【initData】【onErrorResponse】error = " + error.getMessage(), error);
+
+                        //发送失败消息
+                        Message msg = Message.obtain();
+                        msg.what = WHAT_WEATHER_INFO_FAIL;
+                        msg.obj = error;
+                        mHandler.sendMessage(msg);
+                    }
+                });
+        mRequestQueue.add(getWeatherInfoRequest);
     }
 
     /**
@@ -150,6 +328,9 @@ public class PedometerFragment extends Fragment implements View.OnClickListener,
 
         //FAB点击事件
         fabIsShowEtMaxStep.setOnClickListener(this);
+
+        //天气CardView
+        cvWeather.setOnClickListener(this);
     }
 
     /**
@@ -229,6 +410,17 @@ public class PedometerFragment extends Fragment implements View.OnClickListener,
 
                 }
 
+                break;
+
+            //天气CardView
+            case R.id.cardview_weather:
+
+                //跳转到天气Activity
+                Intent intent = new Intent(getActivity(), WeatherActivity.class);
+                if (weatherInfoJSON != null) {
+                    intent.putExtra(Constant.INTENT_FIELD_NAME_WEATHER_INFO_JSON, weatherInfoJSON.toString());
+                }
+                startActivityForResult(intent, Constant.REQUEST_CODE_WEATHER_ACTIVITY);
                 break;
 
             default:

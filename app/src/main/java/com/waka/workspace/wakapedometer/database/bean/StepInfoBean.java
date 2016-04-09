@@ -7,27 +7,29 @@ import java.sql.Date;
  * Created by waka on 2016/2/2.
  */
 public class StepInfoBean {
-    private int step;//步数
+
     private int personId;//人员id
+
+    private int step;//步数
     private Date date;//日期
 
     /**
      * get set 方法
      */
-    public int getStep() {
-        return step;
-    }
-
-    public void setStep(int step) {
-        this.step = step;
-    }
-
     public int getPersonId() {
         return personId;
     }
 
     public void setPersonId(int personId) {
         this.personId = personId;
+    }
+
+    public int getStep() {
+        return step;
+    }
+
+    public void setStep(int step) {
+        this.step = step;
     }
 
     public Date getDate() {

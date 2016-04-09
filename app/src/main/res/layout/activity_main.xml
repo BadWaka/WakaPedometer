@@ -56,7 +56,7 @@
             tools:openDrawer="start">
 
             <!--内容布局-->
-            <include layout="@layout/content_in_activity_main" />
+            <include layout="@layout/content_main_in_activity" />
 
             <!--侧滑菜单布局-->
             <android.support.design.widget.NavigationView

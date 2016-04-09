@@ -106,7 +106,14 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text=" ≈ 绕故宫" />
+                                android:text=" ≈ 绕" />
+
+                            <!--地名-->
+                            <TextView
+                                android:id="@+id/tv_circle_place"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="故宫" />
 
                             <!--圈数-->
                             <TextView
@@ -242,33 +249,14 @@
                         android:layout_height="match_parent"
                         android:layout_marginLeft="@dimen/activity_horizontal_margin">
 
-                        <!--最小温度-->
+                        <!--温度-->
                         <TextView
-                            android:id="@+id/tv_min_temperature"
+                            android:id="@+id/tv_temperature"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
                             android:singleLine="true"
                             android:text="0" />
-
-                        <!--横杠-->
-                        <TextView
-                            android:id="@+id/tv_whippletree"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:layout_toRightOf="@+id/tv_min_temperature"
-                            android:text="-" />
-
-                        <!--最大温度-->
-                        <TextView
-                            android:id="@+id/tv_max_temperature"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:layout_toRightOf="@+id/tv_whippletree"
-                            android:singleLine="true"
-                            android:text="23" />
 
                         <!--摄氏度-->
                         <TextView
@@ -277,7 +265,7 @@
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
                             android:layout_marginRight="@dimen/activity_horizontal_margin"
-                            android:layout_toRightOf="@+id/tv_max_temperature"
+                            android:layout_toRightOf="@+id/tv_temperature"
                             android:text="℃" />
 
                     </RelativeLayout>
@@ -304,7 +292,7 @@
                             android:layout_weight="1"
                             android:gravity="center"
                             android:singleLine="true"
-                            android:text="288" />
+                            android:text="0" />
 
                         <!--污染程度-->
                         <TextView

@@ -4,6 +4,8 @@
 
     <!-- 网络权限 -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- 获取网络信息权限 -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -44,11 +46,15 @@
         <!-- 个人信息界面 -->
         <activity
             android:name=".MineActivity"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <!-- 后台计步服务 -->
         <service android:name=".pedometer.PedometerService" />
 
+        <activity
+            android:name=".weather.WeatherActivity"
+            android:label="@string/title_activity_weather"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
