@@ -1,19 +1,424 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+
+<!--谷歌官方下拉刷新布局-->
+<android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipe_refresh_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/activity_double_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.waka.workspace.wakapedometer.weather.WeatherActivity"
     tools:showIn="@layout/activity_weather">
 
-    <TextView
-        android:id="@+id/tv_data"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/text_margin"
-        android:text="@string/large_text" />
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/nested_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-</android.support.v4.widget.NestedScrollView>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/weather_bg_sunny"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <!--实时温度栏-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tv_temperature"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:textColor="@color/textColorWeatherActivity"
+                    android:textSize="@dimen/text_size_large" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="°C"
+                    android:textColor="@color/textColorWeatherActivity"
+                    android:textSize="@dimen/text_size_large" />
+
+            </LinearLayout>
+
+            <!--天气情况描述-->
+            <TextView
+                android:id="@+id/tv_weather_now_condition_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/textColorWeatherActivity"
+                android:textSize="@dimen/text_size_title" />
+
+            <!--空气质量栏-->
+            <LinearLayout
+                android:id="@+id/layout_weather_air_quality"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:background="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="空气"
+                    android:textColor="@color/textColorWeatherActivity"
+                    android:textSize="@dimen/text_size_sub_head" />
+
+                <TextView
+                    android:id="@+id/tv_weather_air_quality_qlty"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:textColor="@color/textColorWeatherActivity"
+                    android:textSize="@dimen/text_size_sub_head" />
+
+                <ImageView
+                    android:id="@+id/img_weather_air_quality_arrow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/ic_keyboard_arrow_down_white_18dp" />
+
+            </LinearLayout>
+
+            <!--空气质量详情栏，默认隐藏-->
+            <LinearLayout
+                android:id="@+id/layout_weather_air_quality_detail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingLeft="@dimen/activity_double_margin"
+                android:paddingRight="@dimen/activity_double_margin"
+                android:visibility="gone">
+
+                <!--空气质量指数-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="left"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:singleLine="true"
+                        android:text="空气质量指数 : "
+                        android:textColor="@color/textColorWeatherActivity"
+                        android:textSize="@dimen/text_size_body" />
+
+                    <TextView
+                        android:id="@+id/tv_weather_air_quality_aqi"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:singleLine="true"
+                        android:textColor="@color/textColorWeatherActivity"
+                        android:textSize="@dimen/text_size_body" />
+
+                </LinearLayout>
+
+                <!--PM2.5和SO₂-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <!--PM2.5-->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:singleLine="true"
+                            android:text="PM2.5 : "
+                            android:textColor="@color/textColorWeatherActivity"
+                            android:textSize="@dimen/text_size_body" />
+
+                        <TextView
+                            android:id="@+id/tv_weather_air_quality_pm25"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:singleLine="true"
+                            android:textColor="@color/textColorWeatherActivity"
+                            android:textSize="@dimen/text_size_body" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:singleLine="true"
+                            android:text=" μg/m³"
+                            android:textColor="@color/textColorWeatherActivity"
+                            android:textSize="@dimen/text_size_body" />
+                    </LinearLayout>
+
+                    <!--SO₂-->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="right|center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:singleLine="true"
+                            android:text="SO₂ : "
+                            android:textColor="@color/textColorWeatherActivity"
+                            android:textSize="@dimen/text_size_body" />
+
+                        <TextView
+                            android:id="@+id/tv_weather_air_quality_so2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:singleLine="true"
+                            android:textColor="@color/textColorWeatherActivity"
+                            android:textSize="@dimen/text_size_body" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:singleLine="true"
+                            android:text=" μg/m³"
+                            android:textColor="@color/textColorWeatherActivity"
+                            android:textSize="@dimen/text_size_body" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!--PM10和NO₂-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <!--PM10-->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:singleLine="true"
+                            android:text="PM10 : "
+                            android:textColor="@color/textColorWeatherActivity"
+                            android:textSize="@dimen/text_size_body" />
+
+                        <TextView
+                            android:id="@+id/tv_weather_air_quality_pm10"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:singleLine="true"
+                            android:textColor="@color/textColorWeatherActivity"
+                            android:textSize="@dimen/text_size_body" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:singleLine="true"
+                            android:text=" μg/m³"
+                            android:textColor="@color/textColorWeatherActivity"
+                            android:textSize="@dimen/text_size_body" />
+                    </LinearLayout>
+
+                    <!--NO₂-->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="right|center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:singleLine="true"
+                            android:text="NO₂ : "
+                            android:textColor="@color/textColorWeatherActivity"
+                            android:textSize="@dimen/text_size_body" />
+
+                        <TextView
+                            android:id="@+id/tv_weather_air_quality_no2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:singleLine="true"
+                            android:textColor="@color/textColorWeatherActivity"
+                            android:textSize="@dimen/text_size_body" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:singleLine="true"
+                            android:text=" μg/m³"
+                            android:textColor="@color/textColorWeatherActivity"
+                            android:textSize="@dimen/text_size_body" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!--CO和O₃-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <!--CO-->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:singleLine="true"
+                            android:text="CO : "
+                            android:textColor="@color/textColorWeatherActivity"
+                            android:textSize="@dimen/text_size_body" />
+
+                        <TextView
+                            android:id="@+id/tv_weather_air_quality_co"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:singleLine="true"
+                            android:textColor="@color/textColorWeatherActivity"
+                            android:textSize="@dimen/text_size_body" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:singleLine="true"
+                            android:text=" μg/m³"
+                            android:textColor="@color/textColorWeatherActivity"
+                            android:textSize="@dimen/text_size_body" />
+                    </LinearLayout>
+
+                    <!--O₃-->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="right|center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:singleLine="true"
+                            android:text="O₃ : "
+                            android:textColor="@color/textColorWeatherActivity"
+                            android:textSize="@dimen/text_size_body" />
+
+                        <TextView
+                            android:id="@+id/tv_weather_air_quality_o3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:singleLine="true"
+                            android:textColor="@color/textColorWeatherActivity"
+                            android:textSize="@dimen/text_size_body" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:singleLine="true"
+                            android:text=" μg/m³"
+                            android:textColor="@color/textColorWeatherActivity"
+                            android:textSize="@dimen/text_size_body" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!--分割线-->
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/activity_double_margin"
+                android:background="@color/colorCardViewDivider" />
+
+            <!--生活指数，仅限国内城市，国际城市无此字段-->
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_view_suggestion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            </android.support.v7.widget.RecyclerView>
+
+            <!--分割线-->
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorCardViewDivider" />
+
+            <!--每三小时天气预报，全能版为每小时预报-->
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_view_hourly_forecast"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            </android.support.v7.widget.RecyclerView>
+
+            <!--分割线-->
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorCardViewDivider" />
+
+            <!--7天天气预报-->
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_view_daily_forecast"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            </android.support.v7.widget.RecyclerView>
+
+        </LinearLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+
+</android.support.v4.widget.SwipeRefreshLayout>

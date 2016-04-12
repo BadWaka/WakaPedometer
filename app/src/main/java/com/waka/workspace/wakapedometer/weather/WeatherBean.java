@@ -827,8 +827,26 @@ public class WeatherBean {
          */
         public class Level {
 
+            private String type;//类型，不在JSON数据中，本地新增字段
+            private int iconId;//图片id，不在JSON数据中，本地新增字段
             private String brf;//简介
             private String txt;//详细描述
+
+            public String getType() {
+                return type;
+            }
+
+            public void setType(String type) {
+                this.type = type;
+            }
+
+            public int getIconId() {
+                return iconId;
+            }
+
+            public void setIconId(int iconId) {
+                this.iconId = iconId;
+            }
 
             public String getBrf() {
                 return brf;

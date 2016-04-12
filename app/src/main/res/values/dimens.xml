@@ -13,14 +13,12 @@
     <!--底部按钮栏文字大小-->
     <dimen name="tab_tv_textsize">12sp</dimen>
 
-    <dimen name="text_size_title">20sp</dimen>
-    <dimen name="text_size_sub_head">16sp</dimen>
-    <dimen name="text_size_body">14sp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="app_bar_height">180dp</dimen>
     <dimen name="text_margin">16dp</dimen>
 
     <!--通用-->
+
     <!--间距-->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
@@ -31,6 +29,11 @@
     <dimen name="icon_middle">36dp</dimen>
     <dimen name="icon_large">48dp</dimen>
     <dimen name="icon_super_large">96dp</dimen>
+    <!--文字大小-->
+    <dimen name="text_size_title">20sp</dimen>
+    <dimen name="text_size_sub_head">16sp</dimen>
+    <dimen name="text_size_body">14sp</dimen>
+    <dimen name="text_size_large">96sp</dimen>
     <!--CardView cardCornerRadius-->
     <dimen name="card_view_corner_radius">8dp</dimen>
 

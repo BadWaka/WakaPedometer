@@ -8,4 +8,7 @@
     <color name="colorAccent">#f50057</color>
     <!--CardView 分割线-->
     <color name="colorCardViewDivider">#E3E3E3</color>
+
+    <!--天气界面WeatherActivity-->
+    <color name="textColorWeatherActivity">#FFFFFF</color>
 </resources>

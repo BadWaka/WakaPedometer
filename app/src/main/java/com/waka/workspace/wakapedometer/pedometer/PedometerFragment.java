@@ -120,6 +120,7 @@ public class PedometerFragment extends Fragment implements View.OnClickListener,
             wrPedometerFragment = new WeakReference<PedometerFragment>(pedometerFragment);
         }
 
+        @Override
         public void handleMessage(Message msg) {
 
             switch (msg.what) {
@@ -180,17 +181,6 @@ public class PedometerFragment extends Fragment implements View.OnClickListener,
         if (getArguments() != null) {
 
         }
-    }
-
-    @Override
-    /**
-     * onDestroy
-     */
-    public void onDestroy() {
-        super.onDestroy();
-
-        //移除消息队列中所有消息
-        mHandler.removeCallbacksAndMessages(null);
     }
 
     /**
@@ -451,6 +441,21 @@ public class PedometerFragment extends Fragment implements View.OnClickListener,
 
         //观察者从被观察者队列中移除
         StepObservable.getInstance().deleteObserver(this);
+    }
+
+    @Override
+    /**
+     * onDestroy
+     */
+    public void onDestroy() {
+        super.onDestroy();
+
+        //移除请求队列中所有请求
+        mRequestQueue.cancelAll(null);
+
+        //移除消息队列中所有消息
+        mHandler.removeCallbacksAndMessages(null);
+
     }
 
     /**
